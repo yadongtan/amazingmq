@@ -1,10 +1,15 @@
 package com.yadong.amazingmq.server.netty.handler;
 
 import com.yadong.amazingmq.frame.Frame;
+import com.yadong.amazingmq.server.connection.Connection;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
 * @author YadongTan
@@ -16,7 +21,10 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
 
     private static final Logger logger = LoggerFactory.getLogger(BrokerNettyHandler.class);
 
+
     private ChannelHandlerContext context;
+
+    private Connection connection;
 
     //与服务器建立连接之后, 此方法被调用, 设置好上下文
     @Override
@@ -28,6 +36,7 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         logger.info("接收到Frame:" + msg.toString());
+
     }
 
 }

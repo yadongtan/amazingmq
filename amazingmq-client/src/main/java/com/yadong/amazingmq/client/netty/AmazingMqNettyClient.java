@@ -1,6 +1,7 @@
 package com.yadong.amazingmq.client.netty;
 
 
+import com.yadong.amazingmq.client.netty.handler.BrokerNettyClient;
 import com.yadong.amazingmq.client.netty.handler.BrokerNettyClientHandler;
 import com.yadong.amazingmq.codec.BrokerNettyDecoder;
 import com.yadong.amazingmq.codec.BrokerNettyEncoder;
@@ -22,13 +23,26 @@ import org.slf4j.LoggerFactory;
  */
 public class AmazingMqNettyClient {
 
+
+
     private static final Logger logger = LoggerFactory.getLogger(AmazingMqNettyClient.class);
 
-    public void start(String hostname, int port) throws InterruptedException {
-        start0(hostname, port);
+    // 外部使用这个方法来创建一个Connection连接AmazingMqBroker的NettyServer
+    public static BrokerNettyClient createAndConnect(String hostname, int port) throws InterruptedException {
+        return new AmazingMqNettyClient().createClient(hostname, port);
     }
 
-    private void start0(String hostname, int port) throws InterruptedException {
+    private AmazingMqNettyClient(){
+
+    }
+
+    public BrokerNettyClient createClient(String hostname, int port) throws InterruptedException {
+        return createClient0(hostname, port);
+    }
+
+    private BrokerNettyClient createClient0(String hostname, int port) throws InterruptedException {
+
+        BrokerNettyClientHandler client = new BrokerNettyClientHandler();
         NioEventLoopGroup group = new NioEventLoopGroup(8);
         Bootstrap bootstrap = new Bootstrap();
         ByteBuf delimiter = Unpooled.copiedBuffer(BrokerNettyEncoder.DELIMITER.getBytes());
@@ -45,12 +59,13 @@ public class AmazingMqNettyClient {
                                 .addFirst(new DelimiterBasedFrameDecoder(60000,delimiter))
                                 .addLast(new BrokerNettyDecoder())
                                 .addLast(new BrokerNettyEncoder())
-                                .addLast(new BrokerNettyClientHandler());
+                                .addLast(client);
                     }
                 });
         ChannelFuture channelFuture = bootstrap.connect(hostname, port).sync();
         Channel channel = channelFuture.channel();
         logger.info("启动 Client 成功, 连接:[ " +hostname +":" + port +"]");
+        return client;
     }
 
 

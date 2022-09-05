@@ -5,5 +5,5 @@ package com.yadong.amazingmq.server.bind;
 * @date 2022/9/4 23:16
 * @Description the super interface of Binds
 */
-public interface Bind {
+public interface Binding {
 }
