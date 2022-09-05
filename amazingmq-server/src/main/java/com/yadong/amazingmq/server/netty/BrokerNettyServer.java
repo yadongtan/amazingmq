@@ -1,6 +1,9 @@
 package com.yadong.amazingmq.server.netty;
 
-import com.yadong.amazingmq.server.property.ServerProperties;
+import com.yadong.amazingmq.codec.BrokerNettyDecoder;
+import com.yadong.amazingmq.codec.BrokerNettyEncoder;
+import com.yadong.amazingmq.server.netty.handler.BrokerNettyHandler;
+import com.yadong.amazingmq.server.property.BrokerProperties;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -9,8 +12,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,19 +23,19 @@ import java.net.UnknownHostException;
 * @date 2022/9/4 23:00
 * @Description 暴露Broker提供的NettyServer, 单例懒汉式
 */
-public class NettyRpcServer {
+public class BrokerNettyServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyRpcServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(BrokerNettyServer.class);
 
-    private NettyRpcServer(){}
+    private BrokerNettyServer(){}
 
-    private static NettyRpcServer _INSTANCE;
+    private static BrokerNettyServer _INSTANCE;
 
-    public static NettyRpcServer getInstance() {
+    public static BrokerNettyServer getInstance() {
         if(_INSTANCE == null){
-            synchronized (NettyRpcServer.class){
+            synchronized (BrokerNettyServer.class){
                 if(_INSTANCE == null){
-                    _INSTANCE = new NettyRpcServer();
+                    _INSTANCE = new BrokerNettyServer();
                 }
             }
         }
@@ -42,7 +43,7 @@ public class NettyRpcServer {
     }
 
     // the really method to start provider server
-    public void syncStart(ServerProperties properties){
+    public void syncStart(BrokerProperties properties){
         new Thread(()->{
             start(properties);
         }).start();
@@ -50,10 +51,13 @@ public class NettyRpcServer {
 
 
     // the really method to start provider server
-    public void start(ServerProperties properties){
+    public void start(BrokerProperties properties){
         int port = properties.getPort();
         try {
-            String hostAddress = InetAddress.getLocalHost().getHostAddress();
+            String hostAddress = properties.getHost();
+            if(hostAddress == null){
+                hostAddress = InetAddress.getLocalHost().getHostAddress();
+            }
             start0(hostAddress, port);
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -64,7 +68,7 @@ public class NettyRpcServer {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
         NioEventLoopGroup workerGroup = new NioEventLoopGroup(64);
         ServerBootstrap bootstrap = new ServerBootstrap();
-        ByteBuf delimiter = Unpooled.copiedBuffer("\r\n".getBytes());
+        ByteBuf delimiter = Unpooled.copiedBuffer(BrokerNettyEncoder.DELIMITER.getBytes());
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childOption(ChannelOption.TCP_NODELAY, true)
@@ -72,18 +76,20 @@ public class NettyRpcServer {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         ChannelPipeline pipeline = socketChannel.pipeline();
-                        pipeline.addFirst(new DelimiterBasedFrameDecoder(60000,delimiter))
+                        pipeline
                                 //.addLast(new LineBasedFrameDecoder(1024))
-                                .addLast(new StringDecoder())
-                                .addLast(new StringEncoder())
+                                .addFirst(new DelimiterBasedFrameDecoder(60000,delimiter))
+                                .addLast(new BrokerNettyDecoder())
+                                .addLast(new BrokerNettyEncoder())
+                                //.addLast(new LineBasedFrameDecoder(1024))
                                 .addLast(new BrokerNettyHandler());
                     }
                 });
         try {
             ChannelFuture channelFuture = bootstrap.bind(hostname, port);
             Channel channel = channelFuture.channel();
-            logger.info("Dong 启动 Server [" + hostname + ":" + port + "] 成功");
-            //channelFuture.channel().closeFuture().sync();
+            logger.info("启动 Broker [" + hostname + ":" + port + "] 成功");
+            channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();
         }
