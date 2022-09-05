@@ -1,10 +1,12 @@
 package com.yadong.amazingmq.client.connection;
 
+import com.yadong.amazingmq.client.channel.Channel;
 import com.yadong.amazingmq.client.frame.FrameFactory;
 import com.yadong.amazingmq.client.netty.AmazingMqNettyClient;
 import com.yadong.amazingmq.client.netty.handler.BrokerNettyClient;
 import com.yadong.amazingmq.frame.Frame;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class Connection {
@@ -15,6 +17,7 @@ public class Connection {
     private int port;
     private String virtualHost;
     private BrokerNettyClient client;
+    // private List<Channel> channelList; 这里绝不能用channelList, 会造成内存泄露
 
     public Connection(){
 

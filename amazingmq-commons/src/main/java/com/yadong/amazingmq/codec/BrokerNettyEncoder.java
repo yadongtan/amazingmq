@@ -2,6 +2,7 @@ package com.yadong.amazingmq.codec;
 
 
 import com.yadong.amazingmq.frame.Frame;
+import com.yadong.amazingmq.utils.NettyUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -16,11 +17,12 @@ import java.nio.charset.StandardCharsets;
 * @author YadongTan
 * @date 2022/9/5 8:40
 * @Description 编码器,遵循Amqp-0-9-1协议消息格式
- * 0-1字节 type octet
- * 1-3字节 channel short
- * 3-7字节 size long
- * 7-size+7字节 payload size octets
- * size+7-size+8字节 frame-end octet
+ * 0-4字节 frameId -- 自己加的
+ * 4-5字节 type octet
+ * 5-7字节 channel short
+ * 7-11字节 size long
+ * 11 - size+11字节 payload size octets
+ * size+11 - size+12字节 frame-end octet
 */
 public class BrokerNettyEncoder extends MessageToByteEncoder<Frame> {
 
@@ -30,7 +32,10 @@ public class BrokerNettyEncoder extends MessageToByteEncoder<Frame> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Frame msg, ByteBuf out) throws Exception {
 
-        ByteBuffer outBytes = ByteBuffer.allocate(msg.getSize() + 10);
+        ByteBuffer outBytes = ByteBuffer.allocate(msg.getSize() + 14);
+
+        byte[] frameIdBytes = NettyUtils.intToBytes(msg.getFrameId());
+        outBytes.put(frameIdBytes);
 
         byte typeBytes = (byte) (msg.getType() & 0xFF);
         outBytes.put(typeBytes);
@@ -43,8 +48,10 @@ public class BrokerNettyEncoder extends MessageToByteEncoder<Frame> {
         byte[] sizeBytes = new byte[4];
         byte start = (byte) 0XFF;
         int size = msg.getSize();
-        for (int i = 3; i >= 0; i--) {
-            sizeBytes[i] = (byte) (size & start);
+        // 10 9 8 7
+        // 3 2 1 0
+        for (int i = 10; i >= 7; i--) {
+            sizeBytes[i - 7] = (byte) (size & start);
             size = size >> 8;
         }
         outBytes.put(sizeBytes);

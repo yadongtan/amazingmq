@@ -1,6 +1,7 @@
 package com.yadong.amazingmq.client.netty.handler;
 
 
+import com.yadong.amazingmq.client.connection.Connection;
 import com.yadong.amazingmq.frame.Frame;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -28,7 +29,7 @@ public abstract class SyncBrokerNettyClient extends ChannelInboundHandlerAdapter
 
 
     // implement by subclasses!
-    protected Frame send(Frame frame){
+    protected Frame send(Frame frame) throws InterruptedException {
         throw new UnsupportedOperationException();
     }
 

@@ -1,6 +1,9 @@
 package com.yadong.amazingmq.frame;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
 * @author YadongTan
@@ -8,6 +11,9 @@ import java.nio.charset.StandardCharsets;
 * @Description
 */
 public class Frame {
+    private static final AtomicInteger atomicId = new AtomicInteger(0);
+
+    private int frameId;    //帧id
 
     private short type;
 
@@ -16,7 +22,7 @@ public class Frame {
     private int size;
     private String payload;
 
-    private char frameEnd;
+    private char frameEnd = FRAME_END;
 
         public static final char FRAME_END = '\r';
 
@@ -38,7 +44,17 @@ public class Frame {
         }
 
     public Frame(short type, short channel, int size, String payload, char frameEnd) {
-            this.type = new Short(type).byteValue();
+        this.type = new Short(type).byteValue();
+        this.channel = channel;
+        this.size = size;
+        this.payload = payload;
+        this.frameEnd = frameEnd;
+        this.frameId = atomicId.getAndIncrement();
+    }
+
+    public Frame(int frameId, short type, short channel, int size, String payload, char frameEnd) {
+        this.frameId = frameId;
+        this.type = new Short(type).byteValue();
         this.channel = channel;
         this.size = size;
         this.payload = payload;
@@ -79,6 +95,7 @@ public class Frame {
 
     public void setPayload(String payload) {
         this.payload = payload;
+        this.size = payload.getBytes(StandardCharsets.UTF_8).length;
     }
 
     public char getFrameEnd() {
@@ -89,13 +106,22 @@ public class Frame {
         this.frameEnd = frameEnd;
     }
 
+    public int getFrameId() {
+        return frameId;
+    }
+
+    public void setFrameId(int frameId) {
+        this.frameId = frameId;
+    }
+
     @Override
     public String toString() {
         return "Frame{" +
-                "type=" + type +
+                "frameId=" + frameId +
+                ", type=" + type +
                 ", channel=" + channel +
                 ", size=" + size +
                 ", payload='" + payload + '\'' +
-                "'}'";
+                '}';
     }
 }
