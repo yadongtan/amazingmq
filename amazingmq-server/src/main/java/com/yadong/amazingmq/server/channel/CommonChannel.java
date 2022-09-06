@@ -1,5 +1,6 @@
 package com.yadong.amazingmq.server.channel;
 
+
 public class CommonChannel implements Channel{
 
     private short channelId;
