@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE broker SYSTEM "amazingmq.dtd">
+
+<broker>
+    <vhost>
+        <path tag="default">/</path>
+        <username>guest</username>
+        <password>guest</password>
+    </vhost>
+</broker>

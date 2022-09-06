@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!ELEMENT broker (vhost+)>
+        <!ELEMENT vhost (path,username,password)>
+        <!ELEMENT path (#PCDATA)>
+        <!ELEMENT username (#PCDATA)>
+        <!--注意只有一种数据类型：字符串-->
+        <!ELEMENT password (#PCDATA)>
+        <!--注意id必须以字母开头  -->
+        <!ATTLIST path tag ID #REQUIRED>
