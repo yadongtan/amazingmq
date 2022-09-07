@@ -1,9 +1,13 @@
 package com.yadong.amazingmq.server;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.yadong.amazingmq.server.bind.Binding;
+import com.yadong.amazingmq.server.exchange.Exchange;
 import com.yadong.amazingmq.server.netty.BrokerNettyServer;
 import com.yadong.amazingmq.server.property.BrokerProperties;
 import com.yadong.amazingmq.server.property.UserProperties;
+import com.yadong.amazingmq.server.queue.Queue;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 import org.springframework.boot.SpringApplication;
 
@@ -17,19 +21,24 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AmazingMqBroker {
 
+    @JsonIgnore
     private static final AmazingMqBroker _INSTANCE;
+    @JsonIgnore
     private static final String PREFIX = Objects.requireNonNull(AmazingMqBroker.class.getResource("/")).getPath() + "/";
+    @JsonIgnore
     private static final boolean ENABLE_WEB = true;
 
     // host,port
     private BrokerProperties brokerProperties;
     // username -  UserProperties
-    private ConcurrentHashMap<String,UserProperties> userPropertiesMap;
+    private ConcurrentHashMap<String, UserProperties> userPropertiesMap;
     // vhost路径 - vhost
     private ConcurrentHashMap<String, VirtualHost>
             virtualHostMap;
 
-    static{
+
+
+    static {
         _INSTANCE = new AmazingMqBroker();
         // 创建默认vhost
         _INSTANCE.virtualHostMap = new ConcurrentHashMap<>();
@@ -44,27 +53,28 @@ public class AmazingMqBroker {
         // 设置Broker默认配置
         _INSTANCE.brokerProperties = new BrokerProperties("127.0.0.1", 7000);
 
+
+
     }
 
 
     public static void main(String[] args) {
         AmazingMqBroker.getInstance().start();
-        if(ENABLE_WEB){
+        if (ENABLE_WEB) {
             SpringApplication.run(BrokerApplication.class, args);
         }
         //boolean accessible = Auth.accessible(new UserProperties("guest", "guest", "/"));
     }
 
 
+    private AmazingMqBroker() {
+    }
 
-
-    private AmazingMqBroker(){}
-
-    public static AmazingMqBroker getInstance(){
+    public static AmazingMqBroker getInstance() {
         return _INSTANCE;
     }
 
-    public void start(){
+    public void start() {
         BrokerNettyServer.getInstance().syncStart(brokerProperties);
     }
 

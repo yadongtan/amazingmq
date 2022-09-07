@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CommonConnection implements Connection {
 
     // key = 通道id, value = Channel
-    ConcurrentHashMap<Short, Channel> channelConcurrentHashMap
+    ConcurrentHashMap<Short, Channel> channelMap
             = new ConcurrentHashMap<>();
 
     private short connectionId;
@@ -31,12 +31,17 @@ public class CommonConnection implements Connection {
 
     @Override
     public void addChannel(Channel channel){
-        channelConcurrentHashMap.put(channel.getChannelId(), channel);
+        channelMap.put(channel.getChannelId(), channel);
     }
 
     @Override
     public void removeChannel(short channelId){
-        channelConcurrentHashMap.remove(channelId);
+        channelMap.remove(channelId);
+    }
+
+    @Override
+    public ConcurrentHashMap<Short, Channel> getChannelMap() {
+        return channelMap;
     }
 
 }
