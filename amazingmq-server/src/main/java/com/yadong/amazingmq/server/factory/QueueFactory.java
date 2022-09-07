@@ -6,8 +6,12 @@ import com.yadong.amazingmq.server.queue.Queue;
 public class QueueFactory extends AbstractBrokerFactory{
 
 
+    QueueFactory(Frame frame) {
+        super(frame);
+    }
+
     @Override
-    public Queue create(Frame frame) {
+    public Queue create() {
         return null;
     }
 

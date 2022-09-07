@@ -9,9 +9,9 @@ public class BrokerFactoryProducer{
         short type = frame.getType();
         // create connection
         if(type == Frame.PayloadType.CREATE_CONNECTION.getType()){
-            return new ConnectionFactory();
+            return new ConnectionFactory(frame);
         }else if(type == Frame.PayloadType.CREATE_CHANNEL.getType()){
-            return new ChannelFactory();
+            return new ChannelFactory(frame);
         }
         return null;
     }

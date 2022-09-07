@@ -34,10 +34,14 @@ public class BrokerNettyDecoder extends ByteToMessageDecoder {
         short type = in.readByte();
         short channel = in.readShort();
         int size = in.readInt();
-        byte[] payload = new byte[size];
-        in.readBytes(payload);
+        String payloadStr = null;
+        if(size != 0) {
+            byte[] payload = new byte[size];
+            in.readBytes(payload);
+            payloadStr = new String(payload);
+        }
         char frameEnd = (char) in.readByte();
-        Frame frame = new Frame(frameId, type, channel, size, new String(payload), frameEnd);
+        Frame frame = new Frame(frameId, type, channel, size, payloadStr, frameEnd);
         out.add(frame);
     }
 

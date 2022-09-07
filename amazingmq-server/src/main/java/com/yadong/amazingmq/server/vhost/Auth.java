@@ -11,11 +11,11 @@ import com.yadong.amazingmq.server.property.UserProperties;
 */
 public class Auth {
 
-    public static boolean accessible(UserProperties userProperties){
+    public static boolean accessible(UserProperties userProperties) throws AuthErrorException{
         UserProperties localUserProperties = AmazingMqBroker.getInstance().getUserPropertiesMap().get(userProperties.getUsername());
         if (localUserProperties == null) {
             //没有这个用户
-            return false;
+            throw new NoSuchUserException("没有这个用户");
         }
         if (localUserProperties.getPassword().equals(userProperties.getPassword())) {
             //检测有无访问权限
@@ -24,11 +24,11 @@ public class Auth {
                 return true;
             }else{
                 //无访问权限
-                return false;
+                throw new VhostDeniedException("无访问权限");
             }
         }else{
             //密码错误
-            return false;
+            throw new IncorrectPasswordException("密码错误");
         }
     }
 }

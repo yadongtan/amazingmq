@@ -4,15 +4,9 @@ package com.yadong.amazingmq.server;
 import com.yadong.amazingmq.server.netty.BrokerNettyServer;
 import com.yadong.amazingmq.server.property.BrokerProperties;
 import com.yadong.amazingmq.server.property.UserProperties;
-import com.yadong.amazingmq.server.vhost.Auth;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,7 +44,6 @@ public class AmazingMqBroker {
         // 设置Broker默认配置
         _INSTANCE.brokerProperties = new BrokerProperties("127.0.0.1", 7000);
 
-
     }
 
 
@@ -59,7 +52,7 @@ public class AmazingMqBroker {
         if(ENABLE_WEB){
             SpringApplication.run(BrokerApplication.class, args);
         }
-        boolean accessible = Auth.accessible(new UserProperties("guest", "guest", "/"));
+        //boolean accessible = Auth.accessible(new UserProperties("guest", "guest", "/"));
     }
 
 
@@ -98,4 +91,5 @@ public class AmazingMqBroker {
     public void setVirtualHostMap(ConcurrentHashMap<String, VirtualHost> virtualHostMap) {
         this.virtualHostMap = virtualHostMap;
     }
+
 }

@@ -55,10 +55,10 @@ public class BrokerNettyEncoder extends MessageToByteEncoder<Frame> {
             size = size >> 8;
         }
         outBytes.put(sizeBytes);
-
-        byte[] payloadBytes = msg.getPayload().getBytes(StandardCharsets.UTF_8);
-        outBytes.put(payloadBytes);
-
+        if(msg.getSize() != 0) {
+            byte[] payloadBytes = msg.getPayload().getBytes(StandardCharsets.UTF_8);
+            outBytes.put(payloadBytes);
+        }
         byte frameEndBytes = (byte )(msg.getFrameEnd() & 0xFF);
         outBytes.put(frameEndBytes);
         outBytes.put(DELIMITER.getBytes());

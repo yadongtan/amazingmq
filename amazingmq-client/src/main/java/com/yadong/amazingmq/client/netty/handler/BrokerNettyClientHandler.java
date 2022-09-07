@@ -39,7 +39,7 @@ public class BrokerNettyClientHandler extends SyncBrokerNettyClient {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         context = ctx;
         logger.info("Client 与 Broker 建立连接");
-        context.writeAndFlush(new Frame((short)1, (short)2022, 4, "test",'\r'));
+        //context.writeAndFlush(new Frame((short)1, (short)2022, 4, "test",'\r'));
     }
 
     @Override

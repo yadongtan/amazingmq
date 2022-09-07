@@ -1,6 +1,7 @@
 package com.yadong.amazingmq.server.netty.handler;
 
 import com.yadong.amazingmq.frame.Frame;
+import com.yadong.amazingmq.server.Commander;
 import com.yadong.amazingmq.server.connection.Connection;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -21,7 +22,6 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
 
     private static final Logger logger = LoggerFactory.getLogger(BrokerNettyHandler.class);
 
-
     private ChannelHandlerContext context;
 
     private Connection connection;
@@ -37,10 +37,8 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         logger.info("接收到Frame:" + msg.toString());
         Frame received = (Frame) msg;
-        Frame ackFrame = new Frame();
-        ackFrame.setPayload("AckFramePayload");
-        ackFrame.setFrameId(received.getFrameId());
-        ctx.writeAndFlush(ackFrame);
+        Frame frame = Commander.resolveFrame(received);
+        ctx.writeAndFlush(frame);
     }
 
 }

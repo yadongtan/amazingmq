@@ -81,7 +81,6 @@ public class BrokerNettyServer {
                                 .addFirst(new DelimiterBasedFrameDecoder(60000,delimiter))
                                 .addLast(new BrokerNettyDecoder())
                                 .addLast(new BrokerNettyEncoder())
-                                //.addLast(new LineBasedFrameDecoder(1024))
                                 .addLast(new BrokerNettyHandler());
                     }
                 });

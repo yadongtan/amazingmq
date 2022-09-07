@@ -6,8 +6,12 @@ import com.yadong.amazingmq.server.factory.AbstractBrokerFactory;
 
 
 public class ExchangeFactory extends AbstractBrokerFactory {
+    ExchangeFactory(Frame frame) {
+        super(frame);
+    }
+
     @Override
-    public Exchange create(Frame frame) {
+    public Exchange create() {
         return null;
     }
 }

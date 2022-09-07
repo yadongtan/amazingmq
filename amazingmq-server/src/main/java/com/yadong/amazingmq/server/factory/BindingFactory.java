@@ -5,8 +5,12 @@ import com.yadong.amazingmq.server.bind.Binding;
 
 public class BindingFactory extends AbstractBrokerFactory{
 
+    BindingFactory(Frame frame) {
+        super(frame);
+    }
+
     @Override
-    public Binding create(Frame frame) {
+    public Binding create() {
         return null;
     }
 }

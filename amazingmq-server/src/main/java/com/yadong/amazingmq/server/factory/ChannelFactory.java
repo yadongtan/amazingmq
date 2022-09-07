@@ -6,8 +6,12 @@ import com.yadong.amazingmq.server.factory.AbstractBrokerFactory;
 
 public class ChannelFactory extends AbstractBrokerFactory {
 
+    ChannelFactory(Frame frame) {
+        super(frame);
+    }
+
     @Override
-    public Channel create(Frame frame) {
+    public Channel create() {
         return null;
     }
 

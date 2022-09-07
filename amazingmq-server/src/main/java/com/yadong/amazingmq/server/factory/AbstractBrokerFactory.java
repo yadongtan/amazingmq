@@ -1,11 +1,16 @@
 package com.yadong.amazingmq.server.factory;
 
 import com.yadong.amazingmq.frame.Frame;
-import com.yadong.amazingmq.payload.ConnectionPayload;
-import com.yadong.amazingmq.utils.ObjectMapperUtils;
+import com.yadong.amazingmq.server.connection.Connection;
+import com.yadong.amazingmq.server.vhost.AuthErrorException;
 
 public abstract class AbstractBrokerFactory {
 
-    abstract public Object create(Frame frame);
+    Frame frame;
+    AbstractBrokerFactory(Frame frame){
+        this.frame = frame;
+    }
+
+    abstract public Object create() throws AuthErrorException;
 
 }

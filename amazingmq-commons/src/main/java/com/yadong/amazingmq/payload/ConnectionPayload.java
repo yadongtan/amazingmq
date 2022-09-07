@@ -1,6 +1,8 @@
 package com.yadong.amazingmq.payload;
 
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
 * @author YadongTan
 * @date 2022/9/5 17:32
@@ -8,65 +10,49 @@ package com.yadong.amazingmq.payload;
 */
 public class ConnectionPayload implements Payload{
 
-    private String fromHost;
-    private String fromPort;
-    private String destHost;
-    private String destPort;
+    private static AtomicInteger atomicInteger = new AtomicInteger(0);
+
+    private short connectionId;
+    private String username;
+    private String password;
+    private String vhost;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public ConnectionPayload setUsername(String username) {
+        this.username = username;
+        return this;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public ConnectionPayload setPassword(String password) {
+        this.password = password;
+        return this;
+    }
+
+    public String getVhost() {
+        return vhost;
+    }
+
+    public ConnectionPayload setVhost(String vhost) {
+        this.vhost = vhost;
+        return this;
+    }
+
+    public short getConnectionId() {
+        return connectionId;
+    }
+
 
     public ConnectionPayload(){
-
+        this.connectionId = (short) atomicInteger.getAndIncrement();
     }
 
-    public ConnectionPayload(String fromHost, String fromPort, String destHost, String destPort) {
-        this.fromHost = fromHost;
-        this.fromPort = fromPort;
-        this.destHost = destHost;
-        this.destPort = destPort;
-    }
 
-    public String getFromHost() {
-        return fromHost;
-    }
 
-    public ConnectionPayload setFromHost(String fromHost) {
-        this.fromHost = fromHost;
-        return this;
-    }
-
-    public String getFromPort() {
-        return fromPort;
-    }
-
-    public ConnectionPayload setFromPort(String fromPort) {
-        this.fromPort = fromPort;
-        return this;
-    }
-
-    public String getDestHost() {
-        return destHost;
-    }
-
-    public ConnectionPayload setDestHost(String destHost) {
-        this.destHost = destHost;
-        return this;
-    }
-
-    public String getDestPort() {
-        return destPort;
-    }
-
-    public ConnectionPayload setDestPort(String destPort) {
-        this.destPort = destPort;
-        return this;
-    }
-
-    @Override
-    public String toString() {
-        return "ConnectionFrame{" +
-                "fromHost='" + fromHost + '\'' +
-                ", fromPort='" + fromPort + '\'' +
-                ", destHost='" + destHost + '\'' +
-                ", destPort='" + destPort + '\'' +
-                '}';
-    }
 }

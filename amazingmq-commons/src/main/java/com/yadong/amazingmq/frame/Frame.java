@@ -19,29 +19,33 @@ public class Frame {
 
     private short channel;
 
-    private int size;
+    private int size = 0;       //默认是0
     private String payload;
 
-    private char frameEnd = FRAME_END;
+    private char frameEnd = FRAME_END; //默认就有
 
-        public static final char FRAME_END = '\r';
+    public static final char FRAME_END = '\r';
 
-        public enum PayloadType{
-            CREATE_CONNECTION((short) 1), //创建连接Connection
-            CREATE_CHANNEL((short)2);   //在连接内创建一个Channel
-            short type;
-            PayloadType(short type){
-                this.type = type;
-            }
+    public enum PayloadType {
+        ERROR((short) -1),    //错误帧
+        CREATE_CONNECTION((short) 1), //创建连接Connection
+        CREATE_CHANNEL((short) 2),   //在连接内创建一个Channel
+        CREATE_ID_MAX((short)16),   //创建连接相关的最大值
+        SUCCESSFUL((short)17);    //创建组件成功
+        short type;
 
-            public short getType() {
-                return type;
-            }
-
-            public void setType(short type) {
-                this.type = type;
-            }
+        PayloadType(short type) {
+            this.type = type;
         }
+
+        public short getType() {
+            return type;
+        }
+
+        public void setType(short type) {
+            this.type = type;
+        }
+    }
 
     public Frame(short type, short channel, int size, String payload, char frameEnd) {
         this.type = new Short(type).byteValue();
@@ -61,7 +65,7 @@ public class Frame {
         this.frameEnd = frameEnd;
     }
 
-    public Frame(){
+    public Frame() {
 
     }
 
