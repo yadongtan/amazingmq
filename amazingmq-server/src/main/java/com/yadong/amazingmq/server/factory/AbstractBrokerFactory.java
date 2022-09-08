@@ -6,7 +6,8 @@ import com.yadong.amazingmq.server.vhost.AuthErrorException;
 
 public abstract class AbstractBrokerFactory {
 
-    Frame frame;
+    protected Frame frame;
+
     AbstractBrokerFactory(Frame frame){
         this.frame = frame;
     }

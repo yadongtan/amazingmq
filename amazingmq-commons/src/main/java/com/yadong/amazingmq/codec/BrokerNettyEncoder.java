@@ -41,8 +41,8 @@ public class BrokerNettyEncoder extends MessageToByteEncoder<Frame> {
         outBytes.put(typeBytes);
 
         byte[] channelBytes = new byte[2];
-        channelBytes[0] = (byte) ((msg.getChannel() & 0xFF00) >> 8);
-        channelBytes[1] = (byte) (msg.getChannel() & 0xFF);
+        channelBytes[0] = (byte) ((msg.getChannelId() & 0xFF00) >> 8);
+        channelBytes[1] = (byte) (msg.getChannelId() & 0xFF);
         outBytes.put(channelBytes);
 
         byte[] sizeBytes = new byte[4];

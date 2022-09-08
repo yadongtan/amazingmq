@@ -1,6 +1,7 @@
 package com.yadong.amazingmq.client;
 
 
+import com.yadong.amazingmq.client.channel.Channel;
 import com.yadong.amazingmq.client.connection.Connection;
 import com.yadong.amazingmq.client.connection.ConnectionFactory;
 
@@ -16,5 +17,8 @@ public class ClientApplication {
         factory.setVirtualHost("/");
         // 建立到代理服务器的连接
         Connection connection = factory.newConnection();
+        // 创建信道
+        Channel channel = connection.createChannel();
+
     }
 }

@@ -63,7 +63,6 @@ public class BrokerNettyServer {
             e.printStackTrace();
         }
     }
-
     private void start0(String hostname, int port){
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
         NioEventLoopGroup workerGroup = new NioEventLoopGroup(64);

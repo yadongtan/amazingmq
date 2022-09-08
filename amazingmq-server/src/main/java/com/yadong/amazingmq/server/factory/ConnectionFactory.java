@@ -12,6 +12,9 @@ import com.yadong.amazingmq.utils.ObjectMapperUtils;
 
 public class ConnectionFactory extends AbstractBrokerFactory {
 
+    private final ThreadLocal<Connection> connectionThreadLocal = new ThreadLocal<>();
+
+
     ConnectionFactory(Frame frame) {
         super(frame);
     }
@@ -31,6 +34,8 @@ public class ConnectionFactory extends AbstractBrokerFactory {
         connection.setConnectionId(connectionId);
         // 添加到Broker
         AmazingMqBroker.getInstance().getVirtualHostMap().get(vhost).addConnection(connection);
+        // 添加到当前线程
+        connectionThreadLocal.set(connection);
         return connection;
     }
 

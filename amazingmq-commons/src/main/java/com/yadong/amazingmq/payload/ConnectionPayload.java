@@ -10,8 +10,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 */
 public class ConnectionPayload implements Payload{
 
-    private static AtomicInteger atomicInteger = new AtomicInteger(0);
-
     private short connectionId;
     private String username;
     private String password;
@@ -49,8 +47,11 @@ public class ConnectionPayload implements Payload{
     }
 
 
+    public void setConnectionId(short connectionId) {
+        this.connectionId = connectionId;
+    }
+
     public ConnectionPayload(){
-        this.connectionId = (short) atomicInteger.getAndIncrement();
     }
 
 

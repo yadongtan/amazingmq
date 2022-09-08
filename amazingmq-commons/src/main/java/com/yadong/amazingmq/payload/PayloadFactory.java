@@ -9,7 +9,7 @@ public class PayloadFactory {
             case CREATE_CONNECTION:
                 return new ConnectionPayload();
             case CREATE_CHANNEL:
-                break;
+                return new CreateChannelPayload();
         }
         return null;
     }

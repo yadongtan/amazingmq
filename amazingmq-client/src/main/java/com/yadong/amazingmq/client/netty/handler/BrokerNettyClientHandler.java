@@ -61,13 +61,14 @@ public class BrokerNettyClientHandler extends SyncBrokerNettyClient {
             throw new ConcurrentFrameOutOfLimitException("并发越过阈值");
         }
         framesLockArray[index] = frame;
-        context.writeAndFlush(frame);
         synchronized (frame){
+            context.writeAndFlush(frame);
             frame.wait();
         }
         Frame receivedFrame = framesLockArray[index];
         framesLockArray[index] = null;
         return receivedFrame;
     }
+
 
 }

@@ -17,7 +17,7 @@ public class Frame {
 
     private short type;
 
-    private short channel;
+    private short channelId;
 
     private int size = 0;       //默认是0
     private String payload;
@@ -47,9 +47,9 @@ public class Frame {
         }
     }
 
-    public Frame(short type, short channel, int size, String payload, char frameEnd) {
+    public Frame(short type, short channelId, int size, String payload, char frameEnd) {
         this.type = new Short(type).byteValue();
-        this.channel = channel;
+        this.channelId = channelId;
         this.size = size;
         this.payload = payload;
         this.frameEnd = frameEnd;
@@ -59,14 +59,14 @@ public class Frame {
     public Frame(int frameId, short type, short channel, int size, String payload, char frameEnd) {
         this.frameId = frameId;
         this.type = new Short(type).byteValue();
-        this.channel = channel;
+        this.channelId = channel;
         this.size = size;
         this.payload = payload;
         this.frameEnd = frameEnd;
     }
 
     public Frame() {
-
+        this.frameId = atomicId.getAndIncrement();
     }
 
     public short getType() {
@@ -77,12 +77,12 @@ public class Frame {
         this.type = type;
     }
 
-    public short getChannel() {
-        return channel;
+    public short getChannelId() {
+        return channelId;
     }
 
-    public void setChannel(short channel) {
-        this.channel = channel;
+    public void setChannelId(short channelId) {
+        this.channelId = channelId;
     }
 
     public int getSize() {
@@ -123,7 +123,7 @@ public class Frame {
         return "Frame{" +
                 "frameId=" + frameId +
                 ", type=" + type +
-                ", channel=" + channel +
+                ", channelId=" + channelId +
                 ", size=" + size +
                 ", payload='" + payload + '\'' +
                 '}';

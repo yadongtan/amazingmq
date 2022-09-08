@@ -8,9 +8,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
 * @author YadongTan
@@ -37,8 +34,15 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         logger.info("接收到Frame:" + msg.toString());
         Frame received = (Frame) msg;
-        Frame frame = Commander.resolveFrame(received);
+        Frame frame = Commander.resolveFrame(received, this);
         ctx.writeAndFlush(frame);
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
 }
