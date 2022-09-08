@@ -93,4 +93,12 @@ public class VirtualHost {
     public void setBindingMap(ConcurrentHashMap<String, Binding> bindingMap) {
         this.bindingMap = bindingMap;
     }
+
+    public void addExchange(Exchange exchange){
+        exchangeMap.put(exchange.getExchangeName(), exchange);
+    }
+
+    public Exchange getExchange(String exchangeName){
+        return exchangeMap.get(exchangeName);
+    }
 }

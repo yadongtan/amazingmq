@@ -15,10 +15,11 @@ public class ClientApplication {
         factory.setPassword("guest");
         factory.setHost("127.0.0.1");
         factory.setVirtualHost("/");
-        // 建立到代理服务器的连接
+        // 建立到AmazingMq的连接
         Connection connection = factory.newConnection();
         // 创建信道
         Channel channel = connection.createChannel();
-
+        // 声明交换机
+        channel.exchangeDeclare("hello-exchange","direct", true);
     }
 }

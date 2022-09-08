@@ -30,6 +30,7 @@ public class Frame {
         ERROR((short) -1),    //错误帧
         CREATE_CONNECTION((short) 1), //创建连接Connection
         CREATE_CHANNEL((short) 2),   //在连接内创建一个Channel
+        EXCHANGE_DECLARED((short)3), // 声明一个交换机
         CREATE_ID_MAX((short)16),   //创建连接相关的最大值
         SUCCESSFUL((short)17);    //创建组件成功
         short type;

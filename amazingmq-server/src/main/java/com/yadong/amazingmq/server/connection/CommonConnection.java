@@ -1,6 +1,8 @@
 package com.yadong.amazingmq.server.connection;
 
 import com.yadong.amazingmq.server.channel.Channel;
+import com.yadong.amazingmq.server.exchange.Exchange;
+import com.yadong.amazingmq.server.vhost.VirtualHost;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,15 @@ public class CommonConnection implements Connection {
             = new ConcurrentHashMap<>();
 
     private short connectionId;
+    private VirtualHost virtualHost;
+
+    public VirtualHost getVirtualHost() {
+        return virtualHost;
+    }
+
+    public void setVirtualHost(VirtualHost virtualHost) {
+        this.virtualHost = virtualHost;
+    }
 
     @Override
     public short getConnectionId() {

@@ -13,6 +13,8 @@ public class BrokerFactoryProducer{
             return new ConnectionFactory(frame);
         }else if(type == Frame.PayloadType.CREATE_CHANNEL.getType()){
             return new ChannelFactory(frame);
+        }else if(type == Frame.PayloadType.EXCHANGE_DECLARED.getType()){
+            return new ExchangeFactory(frame);
         }
         return null;
     }

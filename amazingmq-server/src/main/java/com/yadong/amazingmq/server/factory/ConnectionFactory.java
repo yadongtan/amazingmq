@@ -32,6 +32,7 @@ public class ConnectionFactory extends AbstractBrokerFactory {
         // 创建连接
         Connection connection = new CommonConnection();
         connection.setConnectionId(connectionId);
+        connection.setVirtualHost(AmazingMqBroker.getInstance().getVirtualHostMap().get(vhost));
         // 添加到Broker
         AmazingMqBroker.getInstance().getVirtualHostMap().get(vhost).addConnection(connection);
         // 添加到当前线程

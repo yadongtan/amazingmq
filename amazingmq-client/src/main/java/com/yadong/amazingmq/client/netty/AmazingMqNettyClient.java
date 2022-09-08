@@ -33,7 +33,6 @@ public class AmazingMqNettyClient {
     }
 
     private AmazingMqNettyClient(){
-
     }
 
     public BrokerNettyClient createClient(String hostname, int port) throws InterruptedException {

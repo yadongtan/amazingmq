@@ -118,7 +118,6 @@ public class Connection {
         AMQChannel channel = new AMQChannel(channelIdGenerator.getAndIncrement(), this, client);
         Frame result = client.syncSend(FrameFactory.createChannelFrame(channel));
         if(result != null){
-            // TODO: 2022/9/5 判断一下发起Connection请求后返回的帧是否是成功的 !
             if(result.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
                 logger.info("创建Channel成功");
             }else{
