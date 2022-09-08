@@ -20,6 +20,11 @@ public class ClientApplication {
         // 创建信道
         Channel channel = connection.createChannel();
         // 声明交换机
-        channel.exchangeDeclare("hello-exchange","direct", true);
+        channel.exchangeDeclare("hello-exchange","direct", false);
+        // 声明队列
+        channel.queueDeclare("hello-queue", false, false, false, null);
+        // 声明绑定
+        channel.queueBind("hello-queue", "hello-exchange", "binding-1");
+
     }
 }

@@ -4,12 +4,12 @@ import com.yadong.amazingmq.client.channel.AMQChannel;
 import com.yadong.amazingmq.client.channel.Channel;
 import com.yadong.amazingmq.client.connection.Connection;
 import com.yadong.amazingmq.frame.Frame;
-import com.yadong.amazingmq.payload.ConnectionPayload;
-import com.yadong.amazingmq.payload.CreateChannelPayload;
-import com.yadong.amazingmq.payload.ExchangeDeclarePayload;
+import com.yadong.amazingmq.payload.*;
 import com.yadong.amazingmq.utils.ObjectMapperUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FrameFactory {
 
@@ -49,6 +49,40 @@ public class FrameFactory {
         Frame frame = new Frame();
         frame.setType(Frame.PayloadType.EXCHANGE_DECLARED.getType());
         frame.setChannelId(channelId);
+        frame.setPayload(ObjectMapperUtils.toJSON(payload));
+        return frame;
+    }
+
+    public static Frame createQueueDeclaredFrame(
+            Channel channel, String queueName,
+            boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> arguments){
+        short channelId = (short) channel.getChannelNumber();
+        QueueDeclarePayload payload = new QueueDeclarePayload();
+        payload.setQueueName(queueName)
+                .setDurable(durable)
+                .setExclusive(exclusive)
+                .setAutoDelete(autoDelete)
+                .setArguments(arguments);
+        Frame frame = new Frame();
+        frame.setChannelId(channelId);
+        frame.setType(Frame.PayloadType.QUEUE_DECLARED.getType());
+        frame.setPayload(ObjectMapperUtils.toJSON(payload));
+        return frame;
+    }
+
+    public static Frame createBindingFrame(
+            Channel channel, String queueName,String exchangeName, String routingKey){
+        short channelId = (short) channel.getChannelNumber();
+        BindingPayload payload = new BindingPayload();
+
+        payload.
+                setQueueName(queueName)
+                .setExchangeName(exchangeName)
+                .setRoutingKey(routingKey);
+
+        Frame frame = new Frame();
+        frame.setChannelId(channelId);
+        frame.setType(Frame.PayloadType.BINDING_DECLARED.getType());
         frame.setPayload(ObjectMapperUtils.toJSON(payload));
         return frame;
     }

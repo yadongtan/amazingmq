@@ -16,6 +16,8 @@ public interface Channel {
 
     boolean exchangeDeclare(String exchangeName, String mode, boolean duration) throws ExecutionException, InterruptedException;
 
+    boolean queueDeclare(String queue, boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> arguments) throws ExecutionException, InterruptedException;
 
+    boolean queueBind(String queueName, String exchangeName, String routingKey) throws ExecutionException, InterruptedException;
 
 }

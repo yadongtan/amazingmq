@@ -25,10 +25,10 @@ public class VirtualHost {
     // 交换机name - exchange
     private ConcurrentHashMap<String, Exchange> exchangeMap;
 
-    // 队列name - exchange
+    // 队列name - quque
     private ConcurrentHashMap<String, Queue> queueMap;
 
-    // 绑定name - Binding
+    // 绑定routingKey - Binding
     private ConcurrentHashMap<String, Binding> bindingMap;
 
     {
@@ -100,5 +100,13 @@ public class VirtualHost {
 
     public Exchange getExchange(String exchangeName){
         return exchangeMap.get(exchangeName);
+    }
+
+    public void addQueue(Queue queue){
+        queueMap.put(queue.getQueueName(), queue);
+    }
+
+    public Queue getQueue(String queueName){
+        return queueMap.get(queueName);
     }
 }

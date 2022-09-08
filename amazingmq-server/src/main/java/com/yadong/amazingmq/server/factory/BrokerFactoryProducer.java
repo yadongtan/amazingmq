@@ -15,6 +15,10 @@ public class BrokerFactoryProducer{
             return new ChannelFactory(frame);
         }else if(type == Frame.PayloadType.EXCHANGE_DECLARED.getType()){
             return new ExchangeFactory(frame);
+        }else if(type == Frame.PayloadType.QUEUE_DECLARED.getType()){
+            return new QueueFactory(frame);
+        }else if(type == Frame.PayloadType.BINDING_DECLARED.getType()){
+            return new BindingFactory(frame);
         }
         return null;
     }

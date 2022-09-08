@@ -1,13 +1,17 @@
 package com.yadong.amazingmq.server;
 
 import com.yadong.amazingmq.frame.Frame;
+import com.yadong.amazingmq.server.bind.Binding;
 import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.connection.Connection;
 import com.yadong.amazingmq.server.exchange.Exchange;
 import com.yadong.amazingmq.server.factory.BrokerFactoryProducer;
 import com.yadong.amazingmq.server.netty.handler.BrokerNettyHandler;
+import com.yadong.amazingmq.server.queue.Queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 
 public class Commander {
 
@@ -31,6 +35,16 @@ public class Commander {
                     Exchange exchange = (Exchange) component;
                     exchange.setVhost(client.getConnection().getVirtualHost());
                     client.getConnection().getVirtualHost().addExchange(exchange);
+                    // 声明队列
+                }else if(frame.getType() == Frame.PayloadType.QUEUE_DECLARED.getType()){
+                    Queue queue = (Queue) component;
+                    queue.setVhost(client.getConnection().getVirtualHost());
+                    client.getConnection().getVirtualHost().addQueue(queue);
+                    // 创建绑定
+                } else if (frame.getType() == Frame.PayloadType.BINDING_DECLARED.getType()) {
+                    Binding binding = (Binding) component;
+                    client.getConnection().getVirtualHost().getExchange(binding.getExchangeName()).setBinding(binding);
+                    client.getConnection().getVirtualHost().getBindingMap().put(binding.getRoutingKey(), binding);
                 }
             }
             //返回创建成功帧

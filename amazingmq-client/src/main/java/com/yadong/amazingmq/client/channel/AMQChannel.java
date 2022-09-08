@@ -7,6 +7,7 @@ import com.yadong.amazingmq.frame.Frame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 
@@ -44,6 +45,30 @@ public class AMQChannel implements Channel{
             return true;
         }else{
             logger.info(" 声明交换机 [" + exchangeName + "] 失败");
+            return false;
+        }
+    }
+
+    @Override
+    public boolean queueDeclare(String queueName, boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> arguments) throws ExecutionException, InterruptedException {
+        Frame frame = client.syncSend(FrameFactory.createQueueDeclaredFrame(this, queueName, durable, exclusive, autoDelete, arguments));
+        if(frame.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
+            logger.info(" 声明队列 [" + queueName + "] 成功");
+            return true;
+        }else{
+            logger.info(" 声明队列 [" + queueName + "] 失败");
+            return false;
+        }
+    }
+
+    @Override
+    public boolean queueBind(String queueName, String exchangeName, String routingKey) throws ExecutionException, InterruptedException {
+        Frame frame = client.syncSend(FrameFactory.createBindingFrame(this, queueName, exchangeName, routingKey));
+        if(frame.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
+            logger.info(" 创建绑定 [" + queueName + "] 成功");
+            return true;
+        }else{
+            logger.info(" 创建绑定 [" + queueName + "] 失败");
             return false;
         }
     }

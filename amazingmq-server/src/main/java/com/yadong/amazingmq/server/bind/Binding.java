@@ -6,4 +6,16 @@ package com.yadong.amazingmq.server.bind;
 * @Description the super interface of Binds
 */
 public interface Binding {
+    public String getQueueName();
+
+    public CommonBinding setQueueName(String queueName);
+
+    public String getExchangeName();
+
+    public CommonBinding setExchangeName(String exchangeName);
+
+    public String getRoutingKey();
+
+    public CommonBinding setRoutingKey(String routingKey);
+
 }

@@ -31,6 +31,8 @@ public class Frame {
         CREATE_CONNECTION((short) 1), //创建连接Connection
         CREATE_CHANNEL((short) 2),   //在连接内创建一个Channel
         EXCHANGE_DECLARED((short)3), // 声明一个交换机
+        QUEUE_DECLARED((short)4),   //声明一个队列
+        BINDING_DECLARED((short)5), //声明绑定
         CREATE_ID_MAX((short)16),   //创建连接相关的最大值
         SUCCESSFUL((short)17);    //创建组件成功
         short type;

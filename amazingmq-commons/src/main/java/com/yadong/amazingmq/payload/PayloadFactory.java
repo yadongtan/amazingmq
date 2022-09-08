@@ -2,6 +2,7 @@ package com.yadong.amazingmq.payload;
 
 import com.yadong.amazingmq.frame.Frame;
 
+@Deprecated
 public class PayloadFactory {
 
     public static Payload createPayload(Frame.PayloadType payloadType) {
