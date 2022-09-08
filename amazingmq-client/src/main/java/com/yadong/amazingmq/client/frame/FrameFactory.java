@@ -4,6 +4,7 @@ import com.yadong.amazingmq.client.channel.AMQChannel;
 import com.yadong.amazingmq.client.channel.Channel;
 import com.yadong.amazingmq.client.connection.Connection;
 import com.yadong.amazingmq.frame.Frame;
+import com.yadong.amazingmq.frame.Message;
 import com.yadong.amazingmq.payload.*;
 import com.yadong.amazingmq.utils.ObjectMapperUtils;
 
@@ -83,6 +84,21 @@ public class FrameFactory {
         Frame frame = new Frame();
         frame.setChannelId(channelId);
         frame.setType(Frame.PayloadType.BINDING_DECLARED.getType());
+        frame.setPayload(ObjectMapperUtils.toJSON(payload));
+        return frame;
+    }
+
+    public static Frame createBasicPublishFrame(
+            Channel channel, String exchangeName, String routingKey, Map<String, Object> basicProperties, byte[] messageBodyBytes){
+        short channelId = (short) channel.getChannelNumber();
+        PublishMessagePayload payload = new PublishMessagePayload();
+        payload.setExchangeName(exchangeName);
+        payload.setRoutingKey(routingKey);
+        payload.setMessage(new Message(messageBodyBytes));
+
+        Frame frame = new Frame();
+        frame.setChannelId(channelId);
+        frame.setType(Frame.PayloadType.BASIC_PUBLISH.getType());
         frame.setPayload(ObjectMapperUtils.toJSON(payload));
         return frame;
     }

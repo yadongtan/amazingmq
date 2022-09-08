@@ -6,6 +6,7 @@ package com.yadong.amazingmq.server.bind;
 * @Description the super interface of Binds
 */
 public interface Binding {
+
     public String getQueueName();
 
     public CommonBinding setQueueName(String queueName);

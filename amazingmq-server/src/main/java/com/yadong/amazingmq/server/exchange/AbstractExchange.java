@@ -1,13 +1,10 @@
 package com.yadong.amazingmq.server.exchange;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.yadong.amazingmq.server.AmazingMqBroker;
 import com.yadong.amazingmq.server.bind.Binding;
-import com.yadong.amazingmq.server.queue.Queue;
+import com.yadong.amazingmq.server.queue.AmazingMqQueue;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractExchange implements Exchange{
@@ -18,7 +15,7 @@ public abstract class AbstractExchange implements Exchange{
     @JsonIgnore
     // 这里是交换机绑定的队列!
     // BindingKey - Queue
-    protected ConcurrentHashMap<String, Queue> queueMap = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<String, AmazingMqQueue> queueMap = new ConcurrentHashMap<>();
 
     protected String exchangeName;
     protected String exchangeType;
@@ -63,7 +60,7 @@ public abstract class AbstractExchange implements Exchange{
     }
 
     public void setBinding(Binding binding) {
-        Queue queue = vhost.getQueue(binding.getQueueName());
+        AmazingMqQueue queue = vhost.getQueue(binding.getQueueName());
         queueMap.put(queue.getQueueName(), queue);
     }
 }

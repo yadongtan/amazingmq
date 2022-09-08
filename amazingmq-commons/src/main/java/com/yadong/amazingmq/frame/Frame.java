@@ -34,7 +34,11 @@ public class Frame {
         QUEUE_DECLARED((short)4),   //声明一个队列
         BINDING_DECLARED((short)5), //声明绑定
         CREATE_ID_MAX((short)16),   //创建连接相关的最大值
-        SUCCESSFUL((short)17);    //创建组件成功
+
+        BASIC_PUBLISH((short)17),   //发布消息
+        CONSUMER_MAX((short)32),    //生产者相关最大类型值
+        SUCCESSFUL((short)64);   //创建组件成功
+
         short type;
 
         PayloadType(short type) {

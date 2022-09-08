@@ -37,7 +37,7 @@ public class BrokerNettyEncoder extends MessageToByteEncoder<Frame> {
         byte[] frameIdBytes = NettyUtils.intToBytes(msg.getFrameId());
         outBytes.put(frameIdBytes);
 
-        byte typeBytes = (byte) (msg.getType() & 0xFF);
+        byte typeBytes = (byte) (msg.getType() & 0xFFFF);
         outBytes.put(typeBytes);
 
         byte[] channelBytes = new byte[2];

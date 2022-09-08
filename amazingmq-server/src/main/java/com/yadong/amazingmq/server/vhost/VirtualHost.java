@@ -4,10 +4,8 @@ package com.yadong.amazingmq.server.vhost;
 import com.yadong.amazingmq.server.bind.Binding;
 import com.yadong.amazingmq.server.connection.Connection;
 import com.yadong.amazingmq.server.exchange.Exchange;
-import com.yadong.amazingmq.server.queue.Queue;
+import com.yadong.amazingmq.server.queue.AmazingMqQueue;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,7 +24,7 @@ public class VirtualHost {
     private ConcurrentHashMap<String, Exchange> exchangeMap;
 
     // 队列name - quque
-    private ConcurrentHashMap<String, Queue> queueMap;
+    private ConcurrentHashMap<String, AmazingMqQueue> queueMap;
 
     // 绑定routingKey - Binding
     private ConcurrentHashMap<String, Binding> bindingMap;
@@ -78,11 +76,11 @@ public class VirtualHost {
         this.exchangeMap = exchangeMap;
     }
 
-    public ConcurrentHashMap<String, Queue> getQueueMap() {
+    public ConcurrentHashMap<String, AmazingMqQueue> getQueueMap() {
         return queueMap;
     }
 
-    public void setQueueMap(ConcurrentHashMap<String, Queue> queueMap) {
+    public void setQueueMap(ConcurrentHashMap<String, AmazingMqQueue> queueMap) {
         this.queueMap = queueMap;
     }
 
@@ -102,11 +100,11 @@ public class VirtualHost {
         return exchangeMap.get(exchangeName);
     }
 
-    public void addQueue(Queue queue){
+    public void addQueue(AmazingMqQueue queue){
         queueMap.put(queue.getQueueName(), queue);
     }
 
-    public Queue getQueue(String queueName){
+    public AmazingMqQueue getQueue(String queueName){
         return queueMap.get(queueName);
     }
 }

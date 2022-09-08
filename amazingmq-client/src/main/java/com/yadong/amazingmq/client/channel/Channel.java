@@ -20,4 +20,5 @@ public interface Channel {
 
     boolean queueBind(String queueName, String exchangeName, String routingKey) throws ExecutionException, InterruptedException;
 
+    boolean basicPublish(String exchangeName, String routingKey, Map<String, Object> basicProperties, byte[] messageBodyBytes) throws ExecutionException, InterruptedException;
 }
