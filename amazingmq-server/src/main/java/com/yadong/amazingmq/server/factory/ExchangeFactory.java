@@ -2,7 +2,9 @@ package com.yadong.amazingmq.server.factory;
 
 import com.yadong.amazingmq.frame.Frame;
 import com.yadong.amazingmq.payload.ExchangeDeclarePayload;
+import com.yadong.amazingmq.server.AmazingMqBroker;
 import com.yadong.amazingmq.server.exchange.*;
+import com.yadong.amazingmq.server.netty.handler.BrokerNettyHandler;
 import com.yadong.amazingmq.utils.ObjectMapperUtils;
 
 
@@ -12,9 +14,13 @@ public class ExchangeFactory extends AbstractBrokerFactory {
     }
 
     @Override
-    public Exchange create() {
+    public Exchange create(BrokerNettyHandler client) {
         ExchangeDeclarePayload payload = ObjectMapperUtils.toObject(frame.getPayload(), ExchangeDeclarePayload.class);
         String exchangeName = payload.getExchangeName();
+        //这个交换机已经存在了,不再创建
+        if(client.getConnection().getVirtualHost().getExchange(exchangeName)!=null){
+            return null;
+        }
         String exchangeType = payload.getExchangeType();
         boolean duration = payload.isDuration();
         switch (exchangeType){

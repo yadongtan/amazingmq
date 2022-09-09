@@ -24,9 +24,11 @@ public class Commander {
         try {
             // 创建相关组件的操作
             if (frame.getType() < Frame.PayloadType.CREATE_ID_MAX.getType()) {
-                Object component = BrokerFactoryProducer.createFactory(frame).create();
-                // 创建连接
-                if(frame.getType() == Frame.PayloadType.CREATE_CONNECTION.getType()){
+                Object component = BrokerFactoryProducer.createFactory(frame).create(client);
+                if(component == null){
+                    // do nothing
+                    //创建连接
+                }else if(frame.getType() == Frame.PayloadType.CREATE_CONNECTION.getType()){
                     client.setConnection((Connection) component);
                     // 创建信道
                 }else if(frame.getType() == Frame.PayloadType.CREATE_CHANNEL.getType()){

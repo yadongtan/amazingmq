@@ -5,6 +5,7 @@ import com.yadong.amazingmq.payload.CreateChannelPayload;
 import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.channel.CommonChannel;
 import com.yadong.amazingmq.server.connection.Connection;
+import com.yadong.amazingmq.server.netty.handler.BrokerNettyHandler;
 import com.yadong.amazingmq.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ public class ChannelFactory extends AbstractBrokerFactory {
     }
 
     @Override
-    public Channel create() {
+    public Channel create(BrokerNettyHandler client) {
         CreateChannelPayload payload = ObjectMapperUtils.toObject(frame.getPayload(), CreateChannelPayload.class);
         // 创建信道
         Channel channel = new CommonChannel();

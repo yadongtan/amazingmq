@@ -6,6 +6,7 @@ import com.yadong.amazingmq.client.connection.Connection;
 import com.yadong.amazingmq.client.connection.ConnectionFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 public class ClientApplication {
@@ -27,6 +28,11 @@ public class ClientApplication {
         // 声明绑定
         channel.queueBind("hello-queue", "hello-exchange", "binding-1");
         // 发布消息
-        channel.basicPublish("hello-exchange","binding-1", null, "hello world!".getBytes(StandardCharsets.UTF_8));
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()){
+            String msg = scanner.nextLine();
+            channel.basicPublish("hello-exchange","binding-1", null, msg.getBytes(StandardCharsets.UTF_8));
+        }
     }
 }

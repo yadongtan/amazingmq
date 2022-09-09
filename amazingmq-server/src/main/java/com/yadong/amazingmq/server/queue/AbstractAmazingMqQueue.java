@@ -174,6 +174,7 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
                     System.out.println("message = " + message);
                     for (Channel channel : channelListenerList) {
                         channel.sendMessage(message);
+                        channelListenerList.remove(channel);
                     }
                 }catch (Exception e){
                     e.printStackTrace();
