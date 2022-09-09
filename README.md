@@ -69,11 +69,11 @@ AmazingMq, 一款基于自定义协议的高吞吐量消息队列中间件
         Connection connection = factory.newConnection();
         // 创建信道
         Channel channel = connection.createChannel();
-        // 声明交换机
+        // 声明交换机, 如果已经有了不会重复创建的
         channel.exchangeDeclare("hello-exchange","direct", false);
-        // 声明队列
+        // 声明队列, 如果已经有了不会重复创建的
         channel.queueDeclare("hello-queue", false, false, false, null);
-        // 声明绑定
+        // 声明绑定, 如果已经有了不会重复创建的
         channel.queueBind("hello-queue", "hello-exchange", "binding-1");
         // 发布消息
         while(true){
