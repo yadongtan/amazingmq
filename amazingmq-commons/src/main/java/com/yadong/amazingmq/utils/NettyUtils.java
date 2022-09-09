@@ -9,6 +9,19 @@ public class NettyUtils {
             ans[3 - i] = (byte)(a >> (i * 8));//截断 int 的低 8 位为一个字节 byte，并存储起来
         return ans;
     }
+    public static byte[] intToByteArray(int n) {
+        /* byte                               0000 0000
+         * short                    0000 0000 0000 0000
+         * int  0000 0000 0000 0000 0000 0000 0000 0000
+         */
+        byte[] b = new byte[4];
+
+        for (int i = 3, j = 0; i >= 0; i--, j++) {
+            b[j] = (byte) ((n >> (i * 8)) & 0xff);
+        }
+
+        return b;
+    }
 
     public static int bytesToInt(byte[] a){
         int ans=0;

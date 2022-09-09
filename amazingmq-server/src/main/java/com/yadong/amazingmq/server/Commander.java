@@ -20,7 +20,6 @@ public class Commander {
     private static final Logger logger = LoggerFactory.getLogger(Commander.class);
 
     public static Frame resolveFrame(Frame frame, BrokerNettyHandler client) {
-
         try {
             // 创建相关组件的操作
             if (frame.getType() < Frame.PayloadType.CREATE_ID_MAX.getType()) {

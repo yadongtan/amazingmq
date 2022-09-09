@@ -11,7 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 * @Description
 */
 public class Frame {
-    private static final AtomicInteger atomicId = new AtomicInteger(0);
+
+    private static final AtomicInteger atomicId = new AtomicInteger(1);
 
     private int frameId;    //帧id
 

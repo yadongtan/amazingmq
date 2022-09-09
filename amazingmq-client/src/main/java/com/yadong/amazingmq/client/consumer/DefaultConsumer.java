@@ -1,7 +1,7 @@
 package com.yadong.amazingmq.client.consumer;
 
-import com.sun.xml.internal.messaging.saaj.soap.Envelope;
 import com.yadong.amazingmq.client.channel.Channel;
+import com.yadong.amazingmq.frame.Envelope;
 
 import java.io.IOException;
 

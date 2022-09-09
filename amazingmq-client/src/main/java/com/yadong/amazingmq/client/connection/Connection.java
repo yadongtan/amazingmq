@@ -116,6 +116,8 @@ public class Connection {
 
     public Channel createChannel() throws ExecutionException, InterruptedException {
         AMQChannel channel = new AMQChannel(channelIdGenerator.getAndIncrement(), this, client);
+        System.out.println("-----------channelId = " + channel.getChannelNumber());
+
         Frame result = client.syncSend(channel, FrameFactory.createChannelFrame(channel));
         if(result != null){
             if(result.getType() == Frame.PayloadType.SUCCESSFUL.getType()){

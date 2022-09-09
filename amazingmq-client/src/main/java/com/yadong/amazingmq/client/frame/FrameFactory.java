@@ -35,6 +35,7 @@ public class FrameFactory {
         payload.setConnectionId(channel.getConnection().getConnectionId());
 
         Frame frame = new Frame();
+        frame.setChannelId(channelId);
         frame.setType(Frame.PayloadType.CREATE_CHANNEL.getType());
         frame.setPayload(ObjectMapperUtils.toJSON(payload));
         return frame;
@@ -112,5 +113,10 @@ public class FrameFactory {
         frame.setType(Frame.PayloadType.BASIC_CONSUME.getType());
         frame.setPayload(ObjectMapperUtils.toJSON(payload));
         return frame;
+    }
+
+    public static void main(String[] args) {
+        byte[] byes = new String("\r\t").getBytes(StandardCharsets.UTF_8);
+        System.out.println("....");
     }
 }

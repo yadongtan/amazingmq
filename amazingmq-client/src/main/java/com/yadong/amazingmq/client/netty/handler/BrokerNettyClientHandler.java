@@ -38,7 +38,7 @@ public class BrokerNettyClientHandler extends SyncBrokerNettyClient {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        logger.info("Client 收到 Broker 返回帧: " + msg.toString());
+        //logger.info("Client 收到 Broker 返回帧: " + msg.toString());
         Frame receivedFrame = (Frame) msg;
         int index = receivedFrame.getChannelId() & (65536 - 1);
         Channel fromChannel = channelLocks[index];

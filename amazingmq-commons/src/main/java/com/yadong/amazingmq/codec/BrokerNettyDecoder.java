@@ -4,11 +4,14 @@ package com.yadong.amazingmq.codec;
 import com.yadong.amazingmq.frame.Frame;
 import com.yadong.amazingmq.utils.NettyUtils;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
+import java.util.Base64;
 import java.util.List;
 
 public class BrokerNettyDecoder extends ByteToMessageDecoder {
@@ -23,21 +26,27 @@ public class BrokerNettyDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         byte[] data = new byte[in.readableBytes()];
-        in.readBytes(data);
-        if(data[data.length - 1] != (byte) (Frame.FRAME_END & 0xFF)){
-            logger.debug("未到结束, 等待结束符");
-            in.resetReaderIndex();
-            return;
-        }
-        in.resetReaderIndex();
+        in.readBytes(data, in.readerIndex(), in.readableBytes());
+
+        Base64.Decoder decoder = Base64.getDecoder();
+        data = decoder.decode(data);    //Base64解码
+
+        in = Unpooled.copiedBuffer(data);
+
         int frameId = in.readInt();
         short type = in.readByte();
+
         short channel = in.readShort();
         int size = in.readInt();
+
         String payloadStr = null;
-        if(size != 0) {
+        if (size != 0) {
             byte[] payload = new byte[size];
-            in.readBytes(payload);
+            try {
+                in.readBytes(payload);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             payloadStr = new String(payload);
         }
         char frameEnd = (char) in.readByte();

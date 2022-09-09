@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yadong.amazingmq.server.netty.BrokerNettyServer;
 import com.yadong.amazingmq.server.property.BrokerProperties;
 import com.yadong.amazingmq.server.property.UserProperties;
-import com.yadong.amazingmq.server.queue.QueueScheduler;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 import org.springframework.boot.SpringApplication;
 
@@ -35,7 +34,6 @@ public class AmazingMqBroker {
             virtualHostMap;
 
 
-
     static {
         _INSTANCE = new AmazingMqBroker();
         // 创建默认vhost
@@ -61,7 +59,6 @@ public class AmazingMqBroker {
         if (ENABLE_WEB) {
             SpringApplication.run(BrokerApplication.class, args);
         }
-        //boolean accessible = Auth.accessible(new UserProperties("guest", "guest", "/"));
     }
 
 

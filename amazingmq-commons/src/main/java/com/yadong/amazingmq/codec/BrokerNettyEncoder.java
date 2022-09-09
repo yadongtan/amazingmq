@@ -8,10 +8,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.BASE64Encoder;
 
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
 * @author YadongTan
@@ -32,9 +34,16 @@ public class BrokerNettyEncoder extends MessageToByteEncoder<Frame> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Frame msg, ByteBuf out) throws Exception {
 
+
+
+        if (msg.getFrameId() > 3335) {
+            System.out.println("...");
+        }
         ByteBuffer outBytes = ByteBuffer.allocate(msg.getSize() + 14);
 
-        byte[] frameIdBytes = NettyUtils.intToBytes(msg.getFrameId());
+        //byte[] frameIdBytes = NettyUtils.intToBytes(msg.getFrameId());
+        byte[] frameIdBytes = NettyUtils.intToByteArray(msg.getFrameId());
+
         outBytes.put(frameIdBytes);
 
         byte typeBytes = (byte) (msg.getType() & 0xFFFF);
@@ -54,15 +63,19 @@ public class BrokerNettyEncoder extends MessageToByteEncoder<Frame> {
             sizeBytes[i - 7] = (byte) (size & start);
             size = size >> 8;
         }
+        logger.info("size = " + msg.getSize());
         outBytes.put(sizeBytes);
-        if(msg.getSize() != 0) {
+        if (msg.getSize() != 0) {
             byte[] payloadBytes = msg.getPayload().getBytes(StandardCharsets.UTF_8);
             outBytes.put(payloadBytes);
         }
-        byte frameEndBytes = (byte )(msg.getFrameEnd() & 0xFF);
+        byte frameEndBytes = (byte) (msg.getFrameEnd() & 0xFF);
         outBytes.put(frameEndBytes);
-        outBytes.put(DELIMITER.getBytes());
-        out.writeBytes(outBytes.array());
+
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encode = encoder.encode(outBytes.array());
+        out.writeBytes(encode);
+        out.writeBytes(DELIMITER.getBytes());
     }
 
 

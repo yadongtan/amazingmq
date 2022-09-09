@@ -33,9 +33,10 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        logger.info("接收到Frame:" + msg.toString());
+        //logger.info("接收到Frame:" + msg.toString());
         Frame received = (Frame) msg;
-        Frame frame = Commander.resolveFrame(received, this);
+        Frame frame = null;
+        frame = Commander.resolveFrame(received, this);
         if(frame != null){
             ctx.writeAndFlush(frame);
         }
