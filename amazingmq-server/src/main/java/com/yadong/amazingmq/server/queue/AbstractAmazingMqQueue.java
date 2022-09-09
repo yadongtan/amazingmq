@@ -3,19 +3,20 @@ package com.yadong.amazingmq.server.queue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yadong.amazingmq.frame.Message;
+import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
 
     @JsonIgnore
     protected VirtualHost vhost;
+    private final List<Channel> channelListenerList = new CopyOnWriteArrayList<>(); //写时复制,读写分离,避免并发问题
 
     protected BlockingQueue<Message> queue;  //实际的queue,采用不同阻塞队列实现
     private String queueName;   //队列名称
@@ -28,6 +29,8 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
 
     private int x_message_ttl = 0;  //消息的过期时间,单位毫秒
     private int x_max_length;   //队列最大长度,超过该最大值,则将从队列头部开始删除消息
+
+
 //    private String x_overflow;  //设置队列溢出行为。这取决了当达到队列的最大长度时消息会发生什么。
 //                                // 有效值是drop-dead、reject-publish或reject-publish-dlx
 
@@ -56,6 +59,9 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
             // 无过期时间, 则使用数组有界阻塞队列
             queue = new LinkedBlockingDeque<>(x_max_length);
         }
+        QueueScheduler.getInstance().addQueue(this);
+        // 启动检测是否要派发消息
+        startMessageScheduler();
     }
 
 
@@ -126,5 +132,54 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
         return queue.offer(message);
     }
 
+    public boolean addChannelListener(Channel channel){
+        boolean added = channelListenerList.add(channel);
+        return added;
+    }
 
+    public boolean removeChannelListener(Channel channel){
+        boolean removed = channelListenerList.remove(channel);
+        return removed;
+    }
+
+    public boolean trySendMessageToConsumer(){
+        Message message = queue.peek();
+        // 无法发送,先把消息继续存在队列里
+        if(message == null || channelListenerList.isEmpty()) return false;
+        // 可以发送,先移除掉当前消息
+        while(message != null){
+            for (Channel channel : channelListenerList) {
+                channel.sendMessage(message);
+            }
+            queue.remove(message);
+            message = queue.peek();
+        }
+        return true;
+    }
+
+    public boolean hashMessage(){
+        return !queue.isEmpty();
+    }
+
+
+    private void startMessageScheduler(){
+        new Thread(() -> {
+            while (true) {
+                Message message = null;
+                try {
+                    if (channelListenerList.isEmpty()) {
+                        continue;
+                    }
+                    message = queue.take();
+                    System.out.println("message = " + message);
+                    for (Channel channel : channelListenerList) {
+                        channel.sendMessage(message);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
 }

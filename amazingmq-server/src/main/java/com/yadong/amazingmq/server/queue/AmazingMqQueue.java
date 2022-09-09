@@ -1,6 +1,7 @@
 package com.yadong.amazingmq.server.queue;
 
 import com.yadong.amazingmq.frame.Message;
+import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 
 import java.util.Map;
@@ -38,4 +39,13 @@ public interface AmazingMqQueue {
     public AmazingMqQueue setArguments(Map<String, Object> arguments);
 
     public boolean offer(Message message) throws OutOfMaxLengthException;
+
+    public boolean addChannelListener(Channel channel);
+
+    public boolean removeChannelListener(Channel channel);
+
+    public boolean trySendMessageToConsumer();
+
+    public boolean hashMessage();
+
 }

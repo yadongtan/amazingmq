@@ -3,6 +3,7 @@ package com.yadong.amazingmq.server.connection;
 
 import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.exchange.Exchange;
+import com.yadong.amazingmq.server.netty.handler.BrokerNettyHandler;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 
 import java.util.List;
@@ -24,4 +25,7 @@ public interface Connection {
 
     public void setVirtualHost(VirtualHost virtualHost);
 
+    public BrokerNettyHandler getClient();
+
+    public void setClient(BrokerNettyHandler client);
 }

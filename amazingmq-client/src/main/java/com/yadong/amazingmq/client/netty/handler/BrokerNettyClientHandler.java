@@ -1,19 +1,13 @@
 package com.yadong.amazingmq.client.netty.handler;
 
-import com.sun.corba.se.impl.orbutil.concurrent.Sync;
-import com.yadong.amazingmq.client.connection.Connection;
+import com.yadong.amazingmq.client.channel.AMQChannel;
+import com.yadong.amazingmq.client.channel.Channel;
 import com.yadong.amazingmq.client.exception.ConcurrentFrameOutOfLimitException;
 import com.yadong.amazingmq.frame.Frame;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Reader;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
 * @author YadongTan
@@ -25,8 +19,8 @@ public class BrokerNettyClientHandler extends SyncBrokerNettyClient {
 
     private static final Logger logger = LoggerFactory.getLogger(BrokerNettyClientHandler.class);
 
-    private final Frame[] framesLockArray = new Frame[65536];    //并发调用时用来降低锁粒度的数组
-
+    private final Channel[] channelLocks = new Channel[65536];    //并发调用时用来降低锁粒度的数组
+    private final Frame[] frameResult = new Frame[65536]; //返回结果
     private ChannelHandlerContext context;
 
     // 怎么才能保证一个线程拿到自己的那份呢, 当前对象是一个Connection所独有的,
@@ -46,27 +40,29 @@ public class BrokerNettyClientHandler extends SyncBrokerNettyClient {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         logger.info("Client 收到 Broker 返回帧: " + msg.toString());
         Frame receivedFrame = (Frame) msg;
-        int index = receivedFrame.getFrameId() & (65536 - 1);
-        Frame sentFrame = framesLockArray[index];
-        synchronized (sentFrame){
-            sentFrame.notify(); // 唤醒原来线程, 返回结果
-            framesLockArray[index] = receivedFrame;
+        int index = receivedFrame.getChannelId() & (65536 - 1);
+        Channel fromChannel = channelLocks[index];
+        synchronized (fromChannel){
+            fromChannel.notify(); // 唤醒原来线程, 返回结果
+            frameResult[index] = receivedFrame;
         }
     }
 
     @Override
-    public Frame send(Frame frame) throws InterruptedException {
-        int index = frame.getFrameId() & (65536 - 1);
-        if(framesLockArray[index] != null){
-            throw new ConcurrentFrameOutOfLimitException("并发越过阈值");
+    public Frame send(Channel channel, Frame frame) throws InterruptedException {
+        if (channel == null) {
+            frame.setChannelId((short)0);
+            // 创建一个空channel,当作锁
+            channel = new AMQChannel(0, null, null);
         }
-        framesLockArray[index] = frame;
-        synchronized (frame){
+        int index = frame.getChannelId() & (65536 - 1);
+        channelLocks[index] = channel;
+        synchronized (channel){
             context.writeAndFlush(frame);
-            frame.wait();
+            channel.wait();
         }
-        Frame receivedFrame = framesLockArray[index];
-        framesLockArray[index] = null;
+        Frame receivedFrame = frameResult[index];   //取出结果
+        channelLocks[index] = null; //锁赋为null
         return receivedFrame;
     }
 

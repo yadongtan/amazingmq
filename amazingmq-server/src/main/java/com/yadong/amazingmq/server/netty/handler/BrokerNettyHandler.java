@@ -8,12 +8,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Callable;
+
 
 /**
 * @author YadongTan
 * @date 2022/9/4 23:03
 * @Description 启动Broker, 用户在连接以后, 生成一个Connection
-
 */
 public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
 
@@ -35,7 +36,9 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
         logger.info("接收到Frame:" + msg.toString());
         Frame received = (Frame) msg;
         Frame frame = Commander.resolveFrame(received, this);
-        ctx.writeAndFlush(frame);
+        if(frame != null){
+            ctx.writeAndFlush(frame);
+        }
     }
 
     public Connection getConnection() {
@@ -44,5 +47,10 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+        connection.setClient(this);
+    }
+
+    public void sendMessage(Frame frame){
+        context.writeAndFlush(frame);
     }
 }

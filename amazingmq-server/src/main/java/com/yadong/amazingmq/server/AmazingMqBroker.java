@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yadong.amazingmq.server.netty.BrokerNettyServer;
 import com.yadong.amazingmq.server.property.BrokerProperties;
 import com.yadong.amazingmq.server.property.UserProperties;
+import com.yadong.amazingmq.server.queue.QueueScheduler;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 import org.springframework.boot.SpringApplication;
 
@@ -50,8 +51,8 @@ public class AmazingMqBroker {
         // 设置Broker默认配置
         _INSTANCE.brokerProperties = new BrokerProperties("127.0.0.1", 7000);
 
-
-
+        //启动队列调度
+        //QueueScheduler.getInstance().startScheduler();
     }
 
 

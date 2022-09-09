@@ -23,7 +23,7 @@ public class VirtualHost {
     // 交换机name - exchange
     private ConcurrentHashMap<String, Exchange> exchangeMap;
 
-    // 队列name - quque
+    // 队列name - queue
     private ConcurrentHashMap<String, AmazingMqQueue> queueMap;
 
     // 绑定routingKey - Binding

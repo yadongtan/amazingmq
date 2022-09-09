@@ -2,6 +2,7 @@ package com.yadong.amazingmq.server;
 
 import com.yadong.amazingmq.frame.Frame;
 import com.yadong.amazingmq.frame.Message;
+import com.yadong.amazingmq.payload.ConsumeMessagePayload;
 import com.yadong.amazingmq.payload.PublishMessagePayload;
 import com.yadong.amazingmq.server.bind.Binding;
 import com.yadong.amazingmq.server.channel.Channel;
@@ -56,11 +57,21 @@ public class Commander {
                     Message message = payload.getMessage();
                     Exchange exchange = client.getConnection().getVirtualHost().getExchange(payload.getExchangeName());
                     exchange.sendMessageToQueue(payload.getRoutingKey(), message);
+                //请求监听一个消息
+                }else if(frame.getType() == Frame.PayloadType.BASIC_CONSUME.getType()){
+                    short channelId = frame.getChannelId();
+                    ConsumeMessagePayload payload = ObjectMapperUtils.toObject(frame.getPayload(), ConsumeMessagePayload.class);
+                    String queueName = payload.getQueueName();
+                    AmazingMqQueue queue = client.getConnection().getVirtualHost().getQueue(queueName);
+                    Channel channel = client.getConnection().getChannelMap().get(channelId);
+                    queue.addChannelListener(channel);
+                    return null;
                 }
             }
 
             //返回创建成功帧
             Frame successfulFrame = new Frame();
+            successfulFrame.setChannelId(frame.getChannelId());
             successfulFrame.setFrameId(frame.getFrameId());
             successfulFrame.setType(Frame.PayloadType.SUCCESSFUL.getType());
             logger.info("返回帧:" + successfulFrame);
@@ -70,6 +81,7 @@ public class Commander {
             // 发生错误, 返回创建发生错误帧
             Frame ackErrorFrame = new Frame();
             ackErrorFrame.setType(Frame.PayloadType.ERROR.getType());
+            ackErrorFrame.setChannelId(frame.getChannelId());
             if(e.getMessage()!= null){
                 ackErrorFrame.setPayload(e.getMessage());
             }

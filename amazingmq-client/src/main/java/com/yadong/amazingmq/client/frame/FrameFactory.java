@@ -102,4 +102,15 @@ public class FrameFactory {
         frame.setPayload(ObjectMapperUtils.toJSON(payload));
         return frame;
     }
+
+    public static Frame createBasicConsumeFrame(Channel channel, String queueName) {
+        short channelId = (short) channel.getChannelNumber();
+        ConsumeMessagePayload payload = new ConsumeMessagePayload();
+        payload.setQueueName(queueName);
+        Frame frame = new Frame();
+        frame.setChannelId(channelId);
+        frame.setType(Frame.PayloadType.BASIC_CONSUME.getType());
+        frame.setPayload(ObjectMapperUtils.toJSON(payload));
+        return frame;
+    }
 }

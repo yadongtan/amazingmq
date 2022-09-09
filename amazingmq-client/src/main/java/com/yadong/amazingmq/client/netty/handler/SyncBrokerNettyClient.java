@@ -1,6 +1,7 @@
 package com.yadong.amazingmq.client.netty.handler;
 
 
+import com.yadong.amazingmq.client.channel.Channel;
 import com.yadong.amazingmq.client.connection.Connection;
 import com.yadong.amazingmq.frame.Frame;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -20,16 +21,16 @@ public abstract class SyncBrokerNettyClient extends ChannelInboundHandlerAdapter
             Executors.newFixedThreadPool(4);
 
     @Override
-    public Frame syncSend(Frame frame) throws ExecutionException, InterruptedException {
+    public Frame syncSend(Channel channel, Frame frame) throws ExecutionException, InterruptedException {
         Frame result = threadPool.submit(() -> {
-            return send(frame);
+            return send(channel, frame);
         }).get();
         return result;
     }
 
 
     // implement by subclasses!
-    protected Frame send(Frame frame) throws InterruptedException {
+    protected Frame send(Channel channel,Frame frame) throws InterruptedException {
         throw new UnsupportedOperationException();
     }
 

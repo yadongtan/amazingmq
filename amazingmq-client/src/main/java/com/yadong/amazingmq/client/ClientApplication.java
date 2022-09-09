@@ -27,6 +27,6 @@ public class ClientApplication {
         // 声明绑定
         channel.queueBind("hello-queue", "hello-exchange", "binding-1");
         // 发布消息
-        channel.basicPublish("hello-exchange","hello-binding-1", null, "hello world!".getBytes(StandardCharsets.UTF_8));
+        channel.basicPublish("hello-exchange","binding-1", null, "hello world!".getBytes(StandardCharsets.UTF_8));
     }
 }

@@ -17,8 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Connection {
 
-    private final AtomicInteger channelIdGenerator = new AtomicInteger(0);
-    private final AtomicInteger connectionIdGenerator = new AtomicInteger(0);
+    private final AtomicInteger channelIdGenerator = new AtomicInteger(1);
+    private final AtomicInteger connectionIdGenerator = new AtomicInteger(1);
     private static final Logger logger = LoggerFactory.getLogger(Connection.class);
 
     private String username;
@@ -93,7 +93,7 @@ public class Connection {
         client = AmazingMqNettyClient.createAndConnect(host, port);
         // 发送一个Connection帧,表示与服务端想建立一个Connection
         Frame connectionFrame = FrameFactory.createConnectionFrame(this);
-        Frame result = client.syncSend(connectionFrame);
+        Frame result = client.syncSend(null, connectionFrame);
         if(result != null){
             // TODO: 2022/9/5 判断一下发起Connection请求后返回的帧是否是成功的 !
             if(result.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
@@ -116,7 +116,7 @@ public class Connection {
 
     public Channel createChannel() throws ExecutionException, InterruptedException {
         AMQChannel channel = new AMQChannel(channelIdGenerator.getAndIncrement(), this, client);
-        Frame result = client.syncSend(FrameFactory.createChannelFrame(channel));
+        Frame result = client.syncSend(channel, FrameFactory.createChannelFrame(channel));
         if(result != null){
             if(result.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
                 logger.info("创建Channel成功");

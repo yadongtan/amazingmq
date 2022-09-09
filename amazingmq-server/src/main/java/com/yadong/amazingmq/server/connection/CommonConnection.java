@@ -2,6 +2,7 @@ package com.yadong.amazingmq.server.connection;
 
 import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.exchange.Exchange;
+import com.yadong.amazingmq.server.netty.handler.BrokerNettyHandler;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
 
 import java.util.ArrayList;
@@ -21,6 +22,15 @@ public class CommonConnection implements Connection {
 
     private short connectionId;
     private VirtualHost virtualHost;
+    private BrokerNettyHandler client;
+
+    public BrokerNettyHandler getClient() {
+        return client;
+    }
+
+    public void setClient(BrokerNettyHandler client) {
+        this.client = client;
+    }
 
     public VirtualHost getVirtualHost() {
         return virtualHost;

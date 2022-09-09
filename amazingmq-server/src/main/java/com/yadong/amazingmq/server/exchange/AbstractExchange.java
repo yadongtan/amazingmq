@@ -61,6 +61,6 @@ public abstract class AbstractExchange implements Exchange{
 
     public void setBinding(Binding binding) {
         AmazingMqQueue queue = vhost.getQueue(binding.getQueueName());
-        queueMap.put(queue.getQueueName(), queue);
+        queueMap.put(binding.getRoutingKey(), queue);
     }
 }

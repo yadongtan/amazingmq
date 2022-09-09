@@ -1,12 +1,11 @@
 package com.yadong.amazingmq.server.channel;
 
 
+import com.yadong.amazingmq.frame.Message;
 import com.yadong.amazingmq.server.connection.Connection;
 
 // 一个Connection有多个Channel...
 public interface Channel {
-
-
 
     short getChannelId();
 
@@ -15,4 +14,6 @@ public interface Channel {
     public Connection getConnection();
 
     public void setConnection(Connection connection);
+
+    public void sendMessage(Message message);
 }

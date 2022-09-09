@@ -36,6 +36,8 @@ public class Frame {
         CREATE_ID_MAX((short)16),   //创建连接相关的最大值
 
         BASIC_PUBLISH((short)17),   //发布消息
+        BASIC_CONSUME((short)18),   //发起监听消费消息帧
+        DELIVER_MESSAGE((short)19), // 队列向消费者发送消息
         CONSUMER_MAX((short)32),    //生产者相关最大类型值
         SUCCESSFUL((short)64);   //创建组件成功
 
