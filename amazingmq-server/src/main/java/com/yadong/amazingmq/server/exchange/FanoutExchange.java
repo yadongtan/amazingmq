@@ -12,9 +12,9 @@ public class FanoutExchange  extends AbstractExchange{
 
     @Override
     public boolean sendMessageToQueue(String routingKey, Message message) throws OutOfMaxLengthException {
-        AmazingMqQueue queue = queueMap.get(routingKey);
-        if(queue == null)
-            return false;
-        return queue.offer(message);
+        for (AmazingMqQueue queue : queueMap.values()) {
+            queue.offer(message);
+        }
+        return true;
     }
 }

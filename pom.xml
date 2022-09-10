@@ -12,6 +12,7 @@
         <module>amazingmq-server</module>
         <module>amazingmq-client</module>
         <module>amazingmq-commons</module>
+        <module>amazingmq-test</module>
     </modules>
 
     <properties>

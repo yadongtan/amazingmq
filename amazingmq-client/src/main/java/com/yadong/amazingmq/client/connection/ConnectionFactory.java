@@ -12,6 +12,8 @@ public class ConnectionFactory {
     private int port = CommonProperty.DEFAULT_BROKER_PORT;  //如果不设置,就使用默认值
     private String virtualHost;
 
+    public ConnectionFactory(){}
+
     public final Connection newConnection() throws InterruptedException, ExecutionException {
         Connection connection = new Connection()
                 .setUsername(username)
