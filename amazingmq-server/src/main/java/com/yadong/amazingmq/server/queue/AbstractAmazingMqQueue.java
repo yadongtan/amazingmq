@@ -5,14 +5,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yadong.amazingmq.frame.Message;
 import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: 2022/9/10 队列属性的设置
 public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAmazingMqQueue.class);
 
     @JsonIgnore
     protected VirtualHost vhost;
@@ -59,7 +64,7 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
             // 无过期时间, 则使用数组有界阻塞队列
             queue = new LinkedBlockingDeque<>(x_max_length);
         }
-        QueueScheduler.getInstance().addQueue(this);
+        //QueueScheduler.getInstance().addQueue(this);
         // 启动检测是否要派发消息
         startMessageScheduler();
     }
@@ -124,7 +129,7 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
         //有过期时间,说明使用的是延迟队列,需要判断是否达到最大值
         if (x_message_ttl != 0) {
             int nextLen = messageLength.incrementAndGet();
-            if(nextLen > x_message_ttl){
+            if(nextLen > x_max_length){
                 messageLength.decrementAndGet();
                 throw new OutOfMaxLengthException("队列已满");
             }
@@ -172,6 +177,12 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
                     }
                     message = queue.take();
                     System.out.println("message = " + message);
+                    // 判断取到的消息是否超过了队列规定的最长时间, 超过了直接返回,这条消息不发了
+                    if (System.currentTimeMillis() - message.getCreateTime() >= x_message_ttl
+                    ||  (message.getX_message_ttl() > 0 && System.currentTimeMillis() - message.getCreateTime() >= message.getX_message_ttl())) {
+                        logger.info("消息过期,被丢弃:" + new String(message.getContent()));
+                        continue;
+                    }
                     for (Channel channel : channelListenerList) {
                         channel.sendMessage(message);
                         channelListenerList.remove(channel);
@@ -181,6 +192,5 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
                 }
             }
         }).start();
-
     }
 }

@@ -95,8 +95,14 @@ public class FrameFactory {
         PublishMessagePayload payload = new PublishMessagePayload();
         payload.setExchangeName(exchangeName);
         payload.setRoutingKey(routingKey);
-        payload.setMessage(new Message(messageBodyBytes));
-
+        Message message = new Message(messageBodyBytes);
+        if(basicProperties != null){
+            Object ttl = basicProperties.get("x-message-ttl");
+            if(ttl  != null){
+                message.setX_message_ttl((int)ttl);
+            }
+        }
+        payload.setMessage(message);
         Frame frame = new Frame();
         frame.setChannelId(channelId);
         frame.setType(Frame.PayloadType.BASIC_PUBLISH.getType());

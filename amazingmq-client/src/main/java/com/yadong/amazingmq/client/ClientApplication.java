@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
@@ -26,17 +28,20 @@ public class ClientApplication {
         // 创建信道
         Channel channel = connection.createChannel();
         // 声明交换机
-        channel.exchangeDeclare("hello-exchange-1","topic", false);
-//        // 声明队列
-//        channel.queueDeclare("hello-queue-1", false, false, false, null);
-//        // 声明绑定
-//        channel.queueBind("hello-queue-1", "hello-exchange-1", "aaa.*.ccc");
-//        // 发布消息
-
+        channel.exchangeDeclare("hello-exchange-1","direct", false);
+        // 声明队列
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-message-ttl", 20000000);
+        channel.queueDeclare("hello-queue-1", false, false, false, arguments);
+        // 声明绑定
+        channel.queueBind("hello-queue-1", "hello-exchange-1", "binding-1");
+        // 发布消息
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String msg = scanner.nextLine();
-            channel.basicPublish("hello-exchange-1", "aaa.bbb.ccc", null, msg.getBytes(StandardCharsets.UTF_8));
+            Map<String, Object> basicProperties = new HashMap<>();
+            basicProperties.put("x-message-ttl", 2);    //设置消息过期为2s
+            channel.basicPublish("hello-exchange-1", "binding-1", basicProperties, msg.getBytes(StandardCharsets.UTF_8));
         }
 //        logger.info("压力测试开始...");
 //        Connection[] connections = new Connection[60];

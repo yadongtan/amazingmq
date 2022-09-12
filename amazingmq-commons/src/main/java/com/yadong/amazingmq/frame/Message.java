@@ -9,18 +9,28 @@ public class Message implements Delayed {
     private static final AtomicInteger idGenerator = new AtomicInteger(0);
     private int messageId;
     private byte[] content;
-    private long start = 0;
+    private long start = 0; //消息什么时候才应该被发送,仅当这是一条延迟消息的时候才启用
+    private long createTime;    //消息的创建时间
+    private long x_message_ttl; //消息过期时间,单位 ms毫秒
 
     public Message(){}
+
+    public Message(byte[] content, long delayInMilliseconds, long x_message_ttl){
+        this(content, delayInMilliseconds);
+        this.x_message_ttl = x_message_ttl;
+    }
 
     public Message(byte[] content, long delayInMilliseconds){
         this.messageId = idGenerator.getAndIncrement();
         this.content = content;
+        this.createTime = System.currentTimeMillis();
         this.start = System.currentTimeMillis() + delayInMilliseconds;
     }
+
     public Message(byte[] content){
         this.messageId = idGenerator.getAndIncrement();
         this.content = content;
+        this.createTime = System.currentTimeMillis();
     }
 
     public int getMessageId() {
@@ -39,6 +49,21 @@ public class Message implements Delayed {
         this.content = content;
     }
 
+    public long getStart() {
+        return start;
+    }
+
+    public void setStart(long start) {
+        this.start = start;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
 
     @Override
     public long getDelay(TimeUnit unit) {
@@ -74,4 +99,11 @@ public class Message implements Delayed {
         return this.messageId;
     }
 
+    public long getX_message_ttl() {
+        return x_message_ttl;
+    }
+
+    public void setX_message_ttl(long x_message_ttl) {
+        this.x_message_ttl = x_message_ttl;
+    }
 }

@@ -1,10 +1,9 @@
 package com.yadong.amazingmq.server.queue;
 
-import com.yadong.amazingmq.server.AmazingMqBroker;
 
-import java.util.Iterator;
+import javax.annotation.PreDestroy;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +13,7 @@ import java.util.concurrent.Executors;
  * @date 2022/9/9 12:35
  * @Description 事件调度者
  */
+@Deprecated
 public class QueueScheduler {
 
     private static final QueueScheduler _INSTANCE = new QueueScheduler();

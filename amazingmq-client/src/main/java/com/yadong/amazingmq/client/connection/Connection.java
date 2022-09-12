@@ -95,7 +95,6 @@ public class Connection {
         Frame connectionFrame = FrameFactory.createConnectionFrame(this);
         Frame result = client.syncSend(null, connectionFrame);
         if(result != null){
-            // TODO: 2022/9/5 判断一下发起Connection请求后返回的帧是否是成功的 !
             if(result.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
                 logger.info("创建Connection成功");
             }else{

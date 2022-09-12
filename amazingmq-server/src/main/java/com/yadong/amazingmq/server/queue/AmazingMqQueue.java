@@ -13,7 +13,6 @@ import java.util.Map;
 */
 public interface AmazingMqQueue {
 
-
     public String getQueueName();
 
     public AmazingMqQueue setQueueName(String queueName);
