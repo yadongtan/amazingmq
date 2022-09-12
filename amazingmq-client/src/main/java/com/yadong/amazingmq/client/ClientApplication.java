@@ -27,11 +27,19 @@ public class ClientApplication {
         Connection connection = factory.newConnection();
         // 创建信道
         Channel channel = connection.createChannel();
+
+        // 声明死信交换机
+        channel.exchangeDeclare("dead-exchange-1","direct", false);
+        // 声明死信队列
+        channel.queueDeclare("dead-queue-1",  false, false, false, null);
+        channel.queueBind("dead-queue-1", "dead-exchange-1", "dead-binding-1");
         // 声明交换机
         channel.exchangeDeclare("hello-exchange-1","direct", false);
         // 声明队列
         Map<String, Object> arguments = new HashMap<>();
         arguments.put("x-message-ttl", 20000000);
+        arguments.put("x-dead-letter-exchange", "dead-exchange-1");
+        arguments.put("x-dead-letter-routing-key", "dead-binding-1");
         channel.queueDeclare("hello-queue-1", false, false, false, arguments);
         // 声明绑定
         channel.queueBind("hello-queue-1", "hello-exchange-1", "binding-1");

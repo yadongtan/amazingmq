@@ -27,7 +27,8 @@ public class QueueFactory extends AbstractBrokerFactory{
                 payload.isAutoDelete(),
                 payload.isDurable(),
                 payload.isExclusive(),
-                payload.getArguments()
+                payload.getArguments(),
+                client.getConnection().getVirtualHost()
                 );
         return queue;
 
