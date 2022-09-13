@@ -3,6 +3,7 @@ package com.yadong.amazingmq.server.queue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yadong.amazingmq.frame.Message;
+import com.yadong.amazingmq.server.AmazingMqBroker;
 import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.exchange.Exchange;
 import com.yadong.amazingmq.server.exchange.NoSuchExchangeException;
@@ -23,7 +24,7 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
 
     @JsonIgnore
     protected VirtualHost vhost;
-    private final List<Channel> channelListenerList = new CopyOnWriteArrayList<>(); //写时复制,读写分离,避免并发问题
+    private List<Channel> channelListenerList = new CopyOnWriteArrayList<>(); //写时复制,读写分离,避免并发问题
     private Exchange deadLetterExchange;    //本队列设置的死信交换机
     private String deadLetterRoutingKey;        //本队列设置的死信交换机对应的routingKey
 
@@ -154,13 +155,31 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
         return queue.offer(message);
     }
 
+    // 添加一个与此队列绑定的channel
     public boolean addChannelListener(Channel channel){
-        boolean added = channelListenerList.add(channel);
+        boolean added = false;
+        synchronized (this) {
+            if(channelListenerList == null){
+                return added;
+            }
+            added = channelListenerList.add(channel);
+        }
         return added;
     }
 
+    //移除一个Channel,这里要判断一下如果移除后没有channel, 是否是声明了自动删除的,如果是, 则应当删除此队列
     public boolean removeChannelListener(Channel channel){
         boolean removed = channelListenerList.remove(channel);
+        synchronized (this){
+            if(channelListenerList.isEmpty()){
+                // 如果是自动删除, 销毁
+                if(autoDelete){
+                    channelListenerList = null;
+                    vhost.removeQueue(queueName);   //此队列移除掉
+                    return true;
+                }
+            }
+        }
         return removed;
     }
 
@@ -188,6 +207,9 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
         new Thread(() -> {
             while (true) {
                 Message message = null;
+                if(channelListenerList == null){    //此队列已被移除掉
+                    return;
+                }
                 try {
                     if (channelListenerList.isEmpty()) {
                         // TODO: 2022/9/12  改为采用异步通知的方式, 换掉死循环提升性能

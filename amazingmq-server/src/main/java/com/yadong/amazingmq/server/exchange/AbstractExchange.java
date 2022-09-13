@@ -27,6 +27,18 @@ public abstract class AbstractExchange implements Exchange{
         this.duration = duration;
     }
 
+    public void removeQueueByRoutingKey(String routingKey){
+        queueMap.remove(routingKey);
+    }
+
+    public void removeQueueByName(String queueName){
+        queueMap.forEach((routingKey, queue) -> {
+            if(queue.getQueueName().equals(queueName)){
+                queueMap.remove(routingKey);
+            }
+        });
+    }
+
     public String getExchangeName() {
         return exchangeName;
     }

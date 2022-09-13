@@ -59,6 +59,7 @@ public class VirtualHost {
     public void removeAndCloseConnection(short cid) {
         Connection remove = connectionMap.remove(cid);
         if(remove != null){
+            // 遍历此连接的所有channel， 调用它们的关闭方法
             remove.getChannelMap().forEach((channelId, channel)->{
                 channel.close();
             });
@@ -112,5 +113,12 @@ public class VirtualHost {
 
     public AmazingMqQueue getQueue(String queueName){
         return queueMap.get(queueName);
+    }
+
+    public void removeQueue(String queueName){
+        queueMap.remove(queueName);
+        exchangeMap.forEach((exchangeName, exchange)->{
+            exchange.removeQueueByName(queueName);
+        });
     }
 }

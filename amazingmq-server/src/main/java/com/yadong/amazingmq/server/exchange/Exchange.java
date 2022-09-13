@@ -33,4 +33,9 @@ public interface Exchange {
 
     //不同的交换机重写这个方法来实现不同的路由
     public boolean sendMessageToQueue(String routingKey, Message message) throws OutOfMaxLengthException;
+
+    public void removeQueueByRoutingKey(String routingKey);
+
+    public void removeQueueByName(String queueName);
+
 }

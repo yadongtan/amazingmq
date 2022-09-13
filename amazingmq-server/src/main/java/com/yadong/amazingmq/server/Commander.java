@@ -54,6 +54,8 @@ public class Commander {
                     AmazingMqQueue queue = (AmazingMqQueue) component;
                     queue.setVhost(client.getConnection().getVirtualHost());
                     client.getConnection().getVirtualHost().addQueue(queue);
+                    Channel channel = client.getConnection().getChannelMap().get(frame.getChannelId());
+                    channel.addQueue(queue);
                     // 创建绑定
                 } else if (frame.getType() == Frame.PayloadType.BINDING_DECLARED.getType()) {
                     Binding binding = (Binding) component;
