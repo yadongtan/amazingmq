@@ -50,7 +50,9 @@ public class ClientApplication {
             Map<String, Object> basicProperties = new HashMap<>();
             basicProperties.put("x-message-ttl", 2);    //设置消息过期为2s
             channel.basicPublish("hello-exchange-1", "binding-1", basicProperties, msg.getBytes(StandardCharsets.UTF_8));
+            break;
         }
+        channel.close();
 //        logger.info("压力测试开始...");
 //        Connection[] connections = new Connection[60];
 //        for (int i = 0; i < 1; i++) {

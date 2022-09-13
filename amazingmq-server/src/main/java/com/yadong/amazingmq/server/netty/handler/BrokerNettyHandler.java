@@ -42,6 +42,16 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
         }
     }
 
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        closeConnection();
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        closeConnection();
+    }
+
     public Connection getConnection() {
         return connection;
     }
@@ -51,7 +61,16 @@ public class BrokerNettyHandler extends ChannelInboundHandlerAdapter{
         connection.setClient(this);
     }
 
-    public void sendMessage(Frame frame){
+    public void sendMessage(Frame frame) {
+
+
         context.writeAndFlush(frame);
+    }
+
+    public void closeConnection(){
+        if(connection != null){
+            logger.info("connection[" + connection.getConnectionId() + "] 断开连接");
+            connection.getVirtualHost().removeAndCloseConnection(connection.getConnectionId());
+        }
     }
 }

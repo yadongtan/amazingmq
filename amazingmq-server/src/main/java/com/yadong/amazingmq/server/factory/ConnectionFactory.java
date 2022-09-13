@@ -23,7 +23,8 @@ public class ConnectionFactory extends AbstractBrokerFactory {
     public Connection create(BrokerNettyHandler client) throws AuthErrorException {
         String payload = frame.getPayload();
         ConnectionPayload connectionPayload = ObjectMapperUtils.toObject(payload, ConnectionPayload.class);
-        short connectionId = connectionPayload.getConnectionId();
+        // short connectionId = connectionPayload.getConnectionId();
+        // 这里的connectionId应该由Broker生成
         String username = connectionPayload.getUsername();
         String password = connectionPayload.getPassword();
         String vhost = connectionPayload.getVhost();
@@ -31,9 +32,7 @@ public class ConnectionFactory extends AbstractBrokerFactory {
         // 鉴权
         Auth.accessible(userProperties);
         // 创建连接
-        Connection connection = new CommonConnection();
-        connection.setConnectionId(connectionId);
-        connection.setVirtualHost(AmazingMqBroker.getInstance().getVirtualHostMap().get(vhost));
+        Connection connection = new CommonConnection(AmazingMqBroker.getInstance().getVirtualHostMap().get(vhost));
         // 添加到Broker
         AmazingMqBroker.getInstance().getVirtualHostMap().get(vhost).addConnection(connection);
         // 添加到当前线程

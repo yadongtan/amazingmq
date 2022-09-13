@@ -65,6 +65,30 @@ public class AmazingMqBrokerController {
                 builder.append("<br/>-------------------------------------------------");
             });
         });
-        return builder.toString();
+        builder.append("<br/>==========================================================");
+        StringBuilder connectionInfo = new StringBuilder();
+        connectionInfo.append("<br/><br/>Broker连接信息:<br/>");
+        virtualHostMap.forEach((vhostName, vhost) ->{
+            connectionInfo.append("<br/>vhost:").append(vhostName);
+            vhost.getConnectionMap().forEach((connectionId, connection)->{
+                connectionInfo.append("<br>&nbsp&nbsp&nbsp&nbsp connectionId:").append(connectionId);
+                connection.getChannelMap().forEach((channelId, channel)->{
+                    connectionInfo.append("<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp channelId:").append(channelId);
+                    connectionInfo.append("<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp当前channel连接queue:");
+                    if(channel.getQueueMap().isEmpty()){
+                        connectionInfo.append("暂未监听任何queue");
+                    }else{
+                        channel.getQueueMap().forEach((queueName, queue)->{
+                            connectionInfo.append("<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp queueName: " ).append(queueName);
+                        });
+                    }
+                });
+            });
+        });
+
+        return builder.toString() + connectionInfo.toString();
+
+
+
     }
 }

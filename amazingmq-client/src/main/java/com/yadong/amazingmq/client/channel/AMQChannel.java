@@ -104,4 +104,16 @@ public class AMQChannel implements Channel{
             return false;
         }
     }
+
+    @Override
+    public boolean close() throws ExecutionException, InterruptedException {
+        Frame frame = client.syncSend(this, FrameFactory.createCloseChannelFrame(this));
+        if(frame.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
+            logger.info("关闭channel[" + frame.getChannelId() + "] 成功" );
+            return true;
+        }else{
+            logger.info("关闭channel[" + frame.getChannelId() + "] 失败" );
+            return false;
+        }
+    }
 }

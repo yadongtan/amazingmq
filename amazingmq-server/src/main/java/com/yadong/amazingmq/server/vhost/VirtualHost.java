@@ -56,8 +56,14 @@ public class VirtualHost {
         connectionMap.put(connection.getConnectionId(), connection);
     }
 
-    public void removeConnection(short cid){
-        connectionMap.remove(cid);
+    public void removeAndCloseConnection(short cid) {
+        Connection remove = connectionMap.remove(cid);
+        if(remove != null){
+            remove.getChannelMap().forEach((channelId, channel)->{
+                channel.close();
+            });
+        }
+
     }
 
     public ConcurrentHashMap<Short, Connection> getConnectionMap() {

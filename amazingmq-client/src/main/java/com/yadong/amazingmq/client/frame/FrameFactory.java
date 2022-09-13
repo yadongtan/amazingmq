@@ -121,6 +121,16 @@ public class FrameFactory {
         return frame;
     }
 
+
+    public static Frame createCloseChannelFrame(Channel channel){
+        short channelId = (short) channel.getChannelNumber();
+        Frame frame = new Frame();
+        frame.setChannelId(channelId);
+        frame.setType(Frame.PayloadType.CLOSE_CHANNEL.getType());
+        return frame;
+    }
+
+
     public static void main(String[] args) {
         byte[] byes = new String("\r\t").getBytes(StandardCharsets.UTF_8);
         System.out.println("....");

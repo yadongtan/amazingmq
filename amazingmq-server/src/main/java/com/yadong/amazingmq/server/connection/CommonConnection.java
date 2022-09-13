@@ -1,5 +1,6 @@
 package com.yadong.amazingmq.server.connection;
 
+import com.yadong.amazingmq.server.AmazingMqBroker;
 import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.exchange.Exchange;
 import com.yadong.amazingmq.server.netty.handler.BrokerNettyHandler;
@@ -8,6 +9,7 @@ import com.yadong.amazingmq.server.vhost.VirtualHost;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author YadongTan
@@ -16,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CommonConnection implements Connection {
 
+
+    private static final AtomicInteger connectionIdGenerator = new AtomicInteger(1);
     // key = 通道id, value = Channel
     ConcurrentHashMap<Short, Channel> channelMap
             = new ConcurrentHashMap<>();
@@ -23,6 +27,14 @@ public class CommonConnection implements Connection {
     private short connectionId;
     private VirtualHost virtualHost;
     private BrokerNettyHandler client;
+
+    public CommonConnection(VirtualHost virtualHost){
+        connectionId = (short) connectionIdGenerator.getAndIncrement();
+        while(virtualHost.getConnectionMap().containsKey(connectionId)){
+            connectionId = (short) connectionIdGenerator.getAndIncrement();
+        }
+        this.virtualHost = virtualHost;
+    }
 
     public BrokerNettyHandler getClient() {
         return client;
@@ -57,6 +69,8 @@ public class CommonConnection implements Connection {
 
     @Override
     public void removeChannel(short channelId){
+        Channel channel = channelMap.get(channelId);
+        channel.close();
         channelMap.remove(channelId);
     }
 

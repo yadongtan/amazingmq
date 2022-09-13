@@ -6,6 +6,8 @@ import com.yadong.amazingmq.client.frame.FrameFactory;
 import com.yadong.amazingmq.client.netty.AmazingMqNettyClient;
 import com.yadong.amazingmq.client.netty.handler.BrokerNettyClient;
 import com.yadong.amazingmq.frame.Frame;
+import com.yadong.amazingmq.payload.ConnectionCreatedPayload;
+import com.yadong.amazingmq.utils.ObjectMapperUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +97,8 @@ public class Connection {
         Frame connectionFrame = FrameFactory.createConnectionFrame(this);
         Frame result = client.syncSend(null, connectionFrame);
         if(result != null){
-            if(result.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
+            if(result.getType() == Frame.PayloadType.CREATE_CONNECTION_SUCCESS.getType()){
+                this.connectionId = ObjectMapperUtils.toObject(result.getPayload(), ConnectionCreatedPayload.class).getConnectionId();
                 logger.info("创建Connection成功");
             }else{
                 logger.info("创建Connection失败");

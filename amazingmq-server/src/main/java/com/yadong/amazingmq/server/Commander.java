@@ -2,6 +2,7 @@ package com.yadong.amazingmq.server;
 
 import com.yadong.amazingmq.frame.Frame;
 import com.yadong.amazingmq.frame.Message;
+import com.yadong.amazingmq.payload.ConnectionCreatedPayload;
 import com.yadong.amazingmq.payload.ConsumeMessagePayload;
 import com.yadong.amazingmq.payload.PublishMessagePayload;
 import com.yadong.amazingmq.server.bind.Binding;
@@ -29,6 +30,16 @@ public class Commander {
                     //创建连接
                 }else if(frame.getType() == Frame.PayloadType.CREATE_CONNECTION.getType()){
                     client.setConnection((Connection) component);
+                    //返回创建成功帧
+                    Frame successfulFrame = new Frame();
+                    successfulFrame.setChannelId(frame.getChannelId());
+                    successfulFrame.setFrameId(frame.getFrameId());
+                    successfulFrame.setType(Frame.PayloadType.CREATE_CONNECTION_SUCCESS.getType());
+                    ConnectionCreatedPayload payload = new ConnectionCreatedPayload();
+                    payload.setConnectionId(((Connection) component).getConnectionId());
+                    successfulFrame.setPayload(ObjectMapperUtils.toJSON(payload));
+                    logger.info("返回帧:" + successfulFrame);
+                    return successfulFrame;
                     // 创建信道
                 }else if(frame.getType() == Frame.PayloadType.CREATE_CHANNEL.getType()){
                     client.getConnection().addChannel((Channel) component);
@@ -65,8 +76,14 @@ public class Commander {
                     String queueName = payload.getQueueName();
                     AmazingMqQueue queue = client.getConnection().getVirtualHost().getQueue(queueName);
                     Channel channel = client.getConnection().getChannelMap().get(channelId);
+                    channel.addQueue(queue);
                     queue.addChannelListener(channel);
                     return null;
+                    // 关闭Channel
+                }else if(frame.getType() == Frame.PayloadType.CLOSE_CHANNEL.getType()){
+                    short channelId = frame.getChannelId();
+                    Connection connection = client.getConnection();
+                    connection.removeChannel(channelId);
                 }
             }
 

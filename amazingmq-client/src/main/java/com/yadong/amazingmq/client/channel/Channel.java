@@ -24,4 +24,6 @@ public interface Channel {
     boolean basicPublish(String exchangeName, String routingKey, Map<String, Object> basicProperties, byte[] messageBodyBytes) throws ExecutionException, InterruptedException;
 
     boolean basicConsume(String queueName, boolean autoAck, String consumerTag, Consumer consumer) throws ExecutionException, InterruptedException, IOException;
+
+    boolean close() throws ExecutionException, InterruptedException;
 }

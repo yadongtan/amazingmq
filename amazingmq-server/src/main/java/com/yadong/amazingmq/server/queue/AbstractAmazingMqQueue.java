@@ -190,20 +190,21 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
                 Message message = null;
                 try {
                     if (channelListenerList.isEmpty()) {
+                        // TODO: 2022/9/12  改为采用异步通知的方式, 换掉死循环提升性能
                         continue;
                     }
                     message = queue.take();
-                    System.out.println("message = " + message);
+                    logger.info("准备发送消息: message:[" + message + "]");
                     // 判断取到的消息是否超过了队列规定的最长时间, 超过了直接返回,这条消息不发了
                     if ((x_message_ttl > 0 && (System.currentTimeMillis() - message.getCreateTime() >= x_message_ttl))
                     ||  (message.getX_message_ttl() > 0 && (System.currentTimeMillis() - message.getCreateTime() >= message.getX_message_ttl()))) {
                         //被丢弃之前,先判断有无死信交换机, 如果有,转发到死信交换机上去
                         if(deadLetterExchange != null){
-                            logger.info("将消息:[" + new String(message.getContent()) + "] 转发到死信交换机:" + deadLetterExchange);
+                            logger.info("将该消息:[" + new String(message.getContent()) + "] 转发到死信交换机:" + deadLetterExchange);
                             message.setX_message_ttl(0);
                             deadLetterExchange.sendMessageToQueue(deadLetterRoutingKey, message);
                         }else{
-                            logger.info("消息过期,被丢弃:" + new String(message.getContent()));
+                            logger.info("改消息过期,被丢弃:" + new String(message.getContent()));
                         }
                         continue;
                     }
