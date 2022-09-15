@@ -1,18 +1,22 @@
 package com.yadong.amazingmq.server.cluster.handler;
 
+import com.yadong.amazingmq.frame.Frame;
+import com.yadong.amazingmq.server.cluster.ClusterCommander;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ClusterServerHandler extends ChannelInboundHandlerAdapter {
 
+    private ChannelHandlerContext context;
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
+        context = ctx;
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        super.channelRead(ctx, msg);
+        ClusterCommander.resolveFrame((Frame) msg);
     }
 
     @Override

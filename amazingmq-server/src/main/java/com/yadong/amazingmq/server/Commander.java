@@ -5,8 +5,11 @@ import com.yadong.amazingmq.frame.Message;
 import com.yadong.amazingmq.payload.ConnectionCreatedPayload;
 import com.yadong.amazingmq.payload.ConsumeMessagePayload;
 import com.yadong.amazingmq.payload.PublishMessagePayload;
+import com.yadong.amazingmq.payload.cluster.ClusterComponentCreatedPayload;
 import com.yadong.amazingmq.server.bind.Binding;
 import com.yadong.amazingmq.server.channel.Channel;
+import com.yadong.amazingmq.server.cluster.AmazingMqClusterApplication;
+import com.yadong.amazingmq.server.cluster.ClusterNettyServer;
 import com.yadong.amazingmq.server.connection.Connection;
 import com.yadong.amazingmq.server.exchange.Exchange;
 import com.yadong.amazingmq.server.factory.BrokerFactoryProducer;
@@ -62,6 +65,11 @@ public class Commander {
                     client.getConnection().getVirtualHost().getExchange(binding.getExchangeName()).setBinding(binding);
                     client.getConnection().getVirtualHost().getBindingMap().put(binding.getRoutingKey(), binding);
                 }
+                //集群转发
+                if(AmazingMqBroker.ENABLE_CLUSTER){
+                    AmazingMqClusterApplication.getInstance().synchronizationMessage(frame, client.getConnection().getVirtualHost().getPath());
+                }
+
                 //生产者的相关类型帧
             } else if (frame.getType() > Frame.PayloadType.CREATE_ID_MAX.getType() && frame.getType() < Frame.PayloadType.CONSUMER_MAX.getType()) {
                 //发布消息

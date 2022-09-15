@@ -3,9 +3,7 @@ package com.yadong.amazingmq.server;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yadong.amazingmq.property.HostInfo;
-import com.yadong.amazingmq.server.cluster.ClusterNettyClient;
-import com.yadong.amazingmq.server.cluster.ClusterNettyServer;
-import com.yadong.amazingmq.server.cluster.handler.ClusterClientHandler;
+import com.yadong.amazingmq.server.cluster.AmazingMqClusterApplication;
 import com.yadong.amazingmq.server.netty.BrokerNettyServer;
 import com.yadong.amazingmq.server.property.BrokerProperties;
 import com.yadong.amazingmq.server.property.UserProperties;
@@ -33,9 +31,9 @@ public class AmazingMqBroker {
     @JsonIgnore
     private static final String PREFIX = Objects.requireNonNull(AmazingMqBroker.class.getResource("/")).getPath() + "/";
     @JsonIgnore
-    private static final boolean ENABLE_WEB = true; //是否开启web状态显示
+    public static final boolean ENABLE_WEB = true; //是否开启web状态显示
     @JsonIgnore
-    private static final boolean ENABLE_CLUSTER = true; //是否开启集群模式/镜像队列
+    public static final boolean ENABLE_CLUSTER = true; //是否开启集群模式/镜像队列
 
 
     // host,port
@@ -45,8 +43,6 @@ public class AmazingMqBroker {
     // vhost路径 - vhost
     private ConcurrentHashMap<String, VirtualHost>
             virtualHostMap;
-    // 集群主机
-    private List<HostInfo> clusterHosts; //不包含主机
 
 
     static {
@@ -63,10 +59,7 @@ public class AmazingMqBroker {
 
         // 设置Broker默认配置
         _INSTANCE.brokerProperties = new BrokerProperties(new HostInfo("127.0.0.1", 7000), new HostInfo("127.0.0.1", 17000));
-
-        // 创建
-        _INSTANCE.clusterHosts = new ArrayList<>();
-        _INSTANCE.clusterHosts.add(new HostInfo("127.0.0.1",17001));    //集群中的Server
+        AmazingMqClusterApplication.getInstance().getClusterHosts().add(new HostInfo("127.0.0.1", 17001));
         //启动队列调度
         //QueueScheduler.getInstance().startScheduler();
     }
@@ -78,26 +71,11 @@ public class AmazingMqBroker {
             SpringApplication.run(BrokerApplication.class, args);
         }
         if(ENABLE_CLUSTER) {
-            // 开放本机集群通信端口
-            ClusterNettyServer.getInstance().syncStart(AmazingMqBroker.getInstance().getBrokerProperties());
-            // 连接集群
-            AmazingMqBroker.getInstance().connectCluster();
+            AmazingMqClusterApplication.getInstance().run();
         }
     }
 
-    private void connectCluster(){
-        List<HostInfo> clusterHosts = AmazingMqBroker.getInstance().getClusterHosts();
-        for (HostInfo clusterHost : clusterHosts) {
-            ClusterClientHandler client = null;
-            while(client == null) {
-                try {
-                    client = ClusterNettyClient.createAndConnect(clusterHost);
-                } catch (Exception e) {
-                    logger.info("连接集群服务器:[" + clusterHost + "] 失败, 正在重连...");
-                }
-            }
-        }
-    }
+
     private AmazingMqBroker() {
     }
 
@@ -133,11 +111,4 @@ public class AmazingMqBroker {
         this.virtualHostMap = virtualHostMap;
     }
 
-    public List<HostInfo> getClusterHosts() {
-        return clusterHosts;
-    }
-
-    public void setClusterHosts(List<HostInfo> clusterHosts) {
-        this.clusterHosts = clusterHosts;
-    }
 }

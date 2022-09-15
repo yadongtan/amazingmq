@@ -2,6 +2,7 @@ package com.yadong.amazingmq.server;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yadong.amazingmq.property.HostInfo;
+import com.yadong.amazingmq.server.cluster.AmazingMqClusterApplication;
 import com.yadong.amazingmq.server.cluster.ClusterNettyClient;
 import com.yadong.amazingmq.server.cluster.ClusterNettyServer;
 import com.yadong.amazingmq.server.cluster.handler.ClusterClientHandler;
@@ -40,7 +41,8 @@ public class AmazingMqBroker2 {
             virtualHostMap;
     // 集群主机
     private List<HostInfo> clusterHosts; //不包含主机
-
+    // 已经与集群建立连接的主机信息
+    private List<ClusterClientHandler> clusterClientHandlerList = new ArrayList<>();
 
     static {
         _INSTANCE = new AmazingMqBroker2();
@@ -57,9 +59,6 @@ public class AmazingMqBroker2 {
         // 设置Broker默认配置
         _INSTANCE.brokerProperties = new BrokerProperties(new HostInfo("127.0.0.1", 7001), new HostInfo("127.0.0.1",17001));
 
-        // 创建
-        _INSTANCE.clusterHosts = new ArrayList<>();
-        _INSTANCE.clusterHosts.add(new HostInfo("127.0.0.1",17000));    //集群中的Server
         //启动队列调度
         //QueueScheduler.getInstance().startScheduler();
     }
@@ -71,27 +70,10 @@ public class AmazingMqBroker2 {
             SpringApplication.run(BrokerApplication.class, args);
         }
         if(ENABLE_CLUSTER) {
-            // 开放本机集群通信端口
-            ClusterNettyServer.getInstance().syncStart(AmazingMqBroker2.getInstance().getBrokerProperties());
-            // 连接集群
-            AmazingMqBroker2.getInstance().connectCluster();
-        }
-
-    }
-
-    private void connectCluster(){
-        List<HostInfo> clusterHosts = AmazingMqBroker2.getInstance().getClusterHosts();
-        for (HostInfo clusterHost : clusterHosts) {
-            ClusterClientHandler client = null;
-            while(client == null) {
-                try {
-                    client = ClusterNettyClient.createAndConnect(clusterHost);
-                } catch (InterruptedException e) {
-                    logger.info("连接集群服务器:[" + clusterHost + "] 失败, 正在重连...");
-                }
-            }
+            AmazingMqClusterApplication.getInstance().run();
         }
     }
+
 
     private AmazingMqBroker2() {
     }
@@ -126,14 +108,6 @@ public class AmazingMqBroker2 {
 
     public void setVirtualHostMap(ConcurrentHashMap<String, VirtualHost> virtualHostMap) {
         this.virtualHostMap = virtualHostMap;
-    }
-
-    public List<HostInfo> getClusterHosts() {
-        return clusterHosts;
-    }
-
-    public void setClusterHosts(List<HostInfo> clusterHosts) {
-        this.clusterHosts = clusterHosts;
     }
 
 
