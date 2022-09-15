@@ -5,11 +5,9 @@ import com.yadong.amazingmq.frame.Message;
 import com.yadong.amazingmq.payload.ConnectionCreatedPayload;
 import com.yadong.amazingmq.payload.ConsumeMessagePayload;
 import com.yadong.amazingmq.payload.PublishMessagePayload;
-import com.yadong.amazingmq.payload.cluster.ClusterComponentCreatedPayload;
 import com.yadong.amazingmq.server.bind.Binding;
 import com.yadong.amazingmq.server.channel.Channel;
 import com.yadong.amazingmq.server.cluster.AmazingMqClusterApplication;
-import com.yadong.amazingmq.server.cluster.ClusterNettyServer;
 import com.yadong.amazingmq.server.connection.Connection;
 import com.yadong.amazingmq.server.exchange.Exchange;
 import com.yadong.amazingmq.server.factory.BrokerFactoryProducer;
@@ -67,7 +65,7 @@ public class Commander {
                 }
                 //集群转发
                 if(AmazingMqBroker.ENABLE_CLUSTER){
-                    AmazingMqClusterApplication.getInstance().synchronizationMessage(frame, client.getConnection().getVirtualHost().getPath());
+                    AmazingMqClusterApplication.getInstance().synchronizationClusterMetadata(frame, client.getConnection().getVirtualHost().getPath());
                 }
 
                 //生产者的相关类型帧
@@ -79,6 +77,9 @@ public class Commander {
                     Message message = payload.getMessage();
                     Exchange exchange = client.getConnection().getVirtualHost().getExchange(payload.getExchangeName());
                     exchange.sendMessageToQueue(payload.getRoutingKey(), message);
+                    if(AmazingMqBroker.ENABLE_CLUSTER){
+                        AmazingMqClusterApplication.getInstance().synchronizationClusterMetadata(frame, client.getConnection().getVirtualHost().getPath());
+                    }
                 //请求监听一个消息
                 }else if(frame.getType() == Frame.PayloadType.BASIC_CONSUME.getType()){
                     short channelId = frame.getChannelId();

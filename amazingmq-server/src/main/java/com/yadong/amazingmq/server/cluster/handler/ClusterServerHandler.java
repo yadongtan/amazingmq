@@ -16,7 +16,8 @@ public class ClusterServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ClusterCommander.resolveFrame((Frame) msg);
+        Frame frame = ClusterCommander.resolveFrame((Frame) msg);
+        ctx.writeAndFlush(frame);
     }
 
     @Override

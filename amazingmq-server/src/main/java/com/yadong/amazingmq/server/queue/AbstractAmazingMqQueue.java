@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yadong.amazingmq.frame.Message;
 import com.yadong.amazingmq.server.AmazingMqBroker;
 import com.yadong.amazingmq.server.channel.Channel;
+import com.yadong.amazingmq.server.cluster.AmazingMqClusterApplication;
 import com.yadong.amazingmq.server.exchange.Exchange;
 import com.yadong.amazingmq.server.exchange.NoSuchExchangeException;
 import com.yadong.amazingmq.server.vhost.VirtualHost;
@@ -216,6 +217,16 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
                         continue;
                     }
                     message = queue.take();
+                    // 如果开启了集群功能的, 在发送之前, 先判断一下其他队列是否已经发送了该消息,如果已经发送了, 那么就不应该再发送了
+                    if (AmazingMqBroker.ENABLE_CLUSTER) {
+                        boolean allow = AmazingMqClusterApplication.getInstance().synchronizationRemoveMessage(vhost.getPath(), queueName, message.getMessageId());
+                        // 如果不允许,那么从来
+                        logger.info("询问是否可以发送此消息结果:" + allow);
+                        if(!allow){
+                            continue;
+                        }
+                    }
+
                     logger.info("准备发送消息: message:[" + message + "]");
                     // 判断取到的消息是否超过了队列规定的最长时间, 超过了直接返回,这条消息不发了
                     if ((x_message_ttl > 0 && (System.currentTimeMillis() - message.getCreateTime() >= x_message_ttl))
@@ -239,5 +250,19 @@ public abstract class AbstractAmazingMqQueue implements AmazingMqQueue {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public boolean clusterTryRemoveMessage(int messageId){
+        // 取头元素出来看看
+        Message msg = queue.peek();
+        if(msg != null && msg.getMessageId() == messageId){
+            Message take = queue.poll();    //移除这个消息
+            logger.info("其他队列正在发送消息, 将移除本队列消息");
+            return true;
+        }else{
+            logger.info("移除消息失败");
+            return false;
+        }
     }
 }

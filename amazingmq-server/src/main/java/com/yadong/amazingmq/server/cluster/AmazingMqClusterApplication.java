@@ -1,7 +1,8 @@
 package com.yadong.amazingmq.server.cluster;
 
 import com.yadong.amazingmq.frame.Frame;
-import com.yadong.amazingmq.payload.cluster.ClusterComponentCreatedPayload;
+import com.yadong.amazingmq.payload.cluster.ClusterMessageRemovedPayload;
+import com.yadong.amazingmq.payload.cluster.ClusterTransmitPayload;
 import com.yadong.amazingmq.property.HostInfo;
 import com.yadong.amazingmq.server.AmazingMqBroker;
 import com.yadong.amazingmq.server.cluster.handler.ClusterClientHandler;
@@ -74,13 +75,30 @@ public class AmazingMqClusterApplication {
     }
 
     //同步这些组件的创建与消息
-    public void synchronizationMessage(Frame frame, String virtualHost){
+    public void synchronizationClusterMetadata(Frame frame, String virtualHost){
         for (ClusterClientHandler clusterClientHandler : clusterClientHandlerList) {
             // 包装这个payload,并转发给集群中其他服务器
-            frame.setPayload(ObjectMapperUtils.toJSON(new ClusterComponentCreatedPayload(frame.getPayload(), virtualHost)));
+            frame.setPayload(ObjectMapperUtils.toJSON(new ClusterTransmitPayload(frame.getPayload(), virtualHost)));
             clusterClientHandler.send(frame);
         }
     }
+
+    public boolean synchronizationRemoveMessage(String vhost, String queueName, int messageId) throws InterruptedException {
+        Frame frame = new Frame();
+        frame.setType(Frame.PayloadType.REMOVE_MESSAGE.getType());
+        MessageResponseCount count = new MessageResponseCount(AmazingMqClusterApplication.getInstance().clusterHosts.size());
+        for (ClusterClientHandler clusterClientHandler : clusterClientHandlerList) {
+            // 包装这个payload,并转发给集群中其他服务器
+            frame.setPayload(ObjectMapperUtils.toJSON(new ClusterMessageRemovedPayload(vhost, queueName, messageId)));
+            clusterClientHandler.sendRemoveMessage(count, frame);
+        }
+        synchronized (count){
+            count.wait();
+        }
+        return count.isOk();
+    }
+
+
 
     public List<HostInfo> getClusterHosts() {
         return clusterHosts;

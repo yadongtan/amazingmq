@@ -47,4 +47,6 @@ public interface AmazingMqQueue {
 
     public boolean hashMessage();
 
+    public boolean clusterTryRemoveMessage(int messageId);
+
 }

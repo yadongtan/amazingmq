@@ -12,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,8 +56,8 @@ public class AmazingMqBroker {
         _INSTANCE.userPropertiesMap.put(userProperties.getUsername(), userProperties);
 
         // 设置Broker默认配置
-        _INSTANCE.brokerProperties = new BrokerProperties(new HostInfo("127.0.0.1", 7000), new HostInfo("127.0.0.1", 17000));
-        AmazingMqClusterApplication.getInstance().getClusterHosts().add(new HostInfo("127.0.0.1", 17001));
+        _INSTANCE.brokerProperties = new BrokerProperties(new HostInfo("127.0.0.1", 7001), new HostInfo("127.0.0.1", 17001));
+        AmazingMqClusterApplication.getInstance().getClusterHosts().add(new HostInfo("127.0.0.1", 17000));
         //启动队列调度
         //QueueScheduler.getInstance().startScheduler();
     }
