@@ -1,6 +1,8 @@
 package com.yadong.amazingmq.server.cluster.handler;
 
 import com.yadong.amazingmq.frame.Frame;
+import com.yadong.amazingmq.property.HostInfo;
+import com.yadong.amazingmq.server.cluster.AmazingMqClusterApplication;
 import com.yadong.amazingmq.server.cluster.MessageResponseCount;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -18,7 +20,12 @@ public class ClusterClientHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ClusterClientHandler.class);
     private ChannelHandlerContext context;
     private final MessageResponseCount[] counts = new MessageResponseCount[1024];
+    private HostInfo hostInfo;
 
+
+    public ClusterClientHandler(String ip, int port){
+        this.hostInfo = new HostInfo(ip, port);
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -42,7 +49,8 @@ public class ClusterClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        logger.info("失去与Broker的连接");
+        AmazingMqClusterApplication.getInstance().removeHandlerAndHostInfo(this, hostInfo);
     }
 
     public void send(Frame frame){

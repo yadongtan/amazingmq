@@ -18,17 +18,32 @@ public class MessageTransmitter {
 
     private static final ExecutorService threadPool = Executors.newFixedThreadPool(64);
     private ProxyClientHandler client;
+    private boolean reset = false;
+
 
     public void establishConnection(ChannelHandlerContext context) throws InterruptedException {
         this.context = context;
         LoadBalance loadBalance = LoadBalanceFactory.getLoadBalance(AmazingProxy.loadBalanceStrategy);
         HostInfo hostInfo = loadBalance.doSelect(AmazingProxy.getInstance().getHostList());
-        client = ProxyNettyClient.createAndConnect(context, hostInfo);
+        client = ProxyNettyClient.createAndConnect(this, context, hostInfo);
     }
 
     public void transmitMessage(ChannelHandlerContext context, Frame frame){
         //发送请求, 等待回调
+        if(reset){
+            //需要重设连接
+            Frame resetFrame = new Frame();
+            resetFrame.setFrameId(frame.getFrameId());
+            resetFrame.setType(Frame.PayloadType.RESET_CONNECTION.getType());
+            context.writeAndFlush(resetFrame);
+            reset = false;
+            return;
+        }
         client.send(frame);
+    }
+
+    public void reconnectClient() throws InterruptedException {
+        establishConnection(this.context);
     }
 
 }

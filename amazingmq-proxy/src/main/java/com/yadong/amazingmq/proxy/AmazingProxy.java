@@ -27,6 +27,7 @@ public class AmazingProxy {
 
     {
         hostList.add(new HostInfo("localhost",7000));
+        hostList.add(new HostInfo("localhost",7001));
         //hostList.add(new HostInfo("localhost",7001));
     }
 
@@ -38,6 +39,10 @@ public class AmazingProxy {
 
     public void startProxy(){
         ProxyNettyServer.getInstance().syncStart(new ProxyProperties("localhost", 36666));
+    }
+
+    public void removeHost(HostInfo hostInfo){
+        hostList.remove(hostInfo);
     }
 
     public static void main(String[] args) {

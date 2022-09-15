@@ -42,7 +42,7 @@ public class ClusterNettyClient {
     }
 
     private ClusterClientHandler createClient0(String hostname, int port) throws InterruptedException {
-        ClusterClientHandler client = new ClusterClientHandler();
+        ClusterClientHandler client = new ClusterClientHandler(hostname, port);
         NioEventLoopGroup group = new NioEventLoopGroup(1);
         Bootstrap bootstrap = new Bootstrap();
         ByteBuf delimiter = Unpooled.copiedBuffer(BrokerNettyEncoder.DELIMITER.getBytes());

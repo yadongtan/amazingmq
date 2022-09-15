@@ -44,7 +44,8 @@ public class Frame {
         SUCCESSFUL((short)64),   //创建组件成功
         REMOVE_MESSAGE((short)65),  // 集群间移除多的消息
         REMOVED_MESSAGE_SUCCESSFULLY((short)66),    //移除成功
-        CREATE_CONNECTION_SUCCESS((short)67);   //创建Connection成功
+        RESET_CONNECTION((short)67),    //重设连接
+        CREATE_CONNECTION_SUCCESS((short)68);   //创建Connection成功
         short type;
 
         PayloadType(short type) {

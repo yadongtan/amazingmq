@@ -7,6 +7,7 @@ import com.yadong.amazingmq.property.HostInfo;
 import com.yadong.amazingmq.server.AmazingMqBroker;
 import com.yadong.amazingmq.server.cluster.handler.ClusterClientHandler;
 import com.yadong.amazingmq.utils.ObjectMapperUtils;
+import io.netty.channel.ChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,4 +108,22 @@ public class AmazingMqClusterApplication {
     public void setClusterHosts(List<HostInfo> clusterHosts) {
         this.clusterHosts = clusterHosts;
     }
+
+    public List<ClusterClientHandler> getClusterClientHandlerList() {
+        return clusterClientHandlerList;
+    }
+
+    public void addClusterClientHandler(ClusterClientHandler handler) {
+        clusterClientHandlerList.add(handler);
+    }
+
+    public void removeClusterClientHandler(ClusterClientHandler handler){
+        clusterClientHandlerList.remove(handler);
+    }
+
+    public void removeHandlerAndHostInfo(ClusterClientHandler handler, HostInfo hostInfo){
+        clusterClientHandlerList.remove(handler);
+        clusterHosts.remove(hostInfo);
+    }
+
 }

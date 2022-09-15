@@ -63,6 +63,7 @@ public class BrokerNettyClientHandler extends SyncBrokerNettyClient {
         }
         Frame receivedFrame = frameResult[index];   //取出结果
         channelLocks[index] = null; //锁赋为null
+
         return receivedFrame;
     }
 

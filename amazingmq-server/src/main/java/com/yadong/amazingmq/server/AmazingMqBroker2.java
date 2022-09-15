@@ -57,7 +57,7 @@ public class AmazingMqBroker2 {
         _INSTANCE.userPropertiesMap.put(userProperties.getUsername(), userProperties);
 
         // 设置Broker默认配置
-        _INSTANCE.brokerProperties = new BrokerProperties(new HostInfo("127.0.0.1", 7001), new HostInfo("127.0.0.1",17001));
+        _INSTANCE.brokerProperties = new BrokerProperties(new HostInfo("127.0.0.1", 7000), new HostInfo("127.0.0.1",17000));
 
         //启动队列调度
         //QueueScheduler.getInstance().startScheduler();

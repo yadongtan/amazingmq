@@ -4,6 +4,7 @@ package com.yadong.amazingmq.proxy.netty;
 import com.yadong.amazingmq.codec.BrokerNettyDecoder;
 import com.yadong.amazingmq.codec.BrokerNettyEncoder;
 import com.yadong.amazingmq.property.HostInfo;
+import com.yadong.amazingmq.proxy.netty.handler.MessageTransmitter;
 import com.yadong.amazingmq.proxy.netty.handler.ProxyClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -27,24 +28,24 @@ public class ProxyNettyClient {
     private static final Logger logger = LoggerFactory.getLogger(ProxyNettyClient.class);
 
     // 外部使用这个方法来创建一个Connection连接AmazingMqBroker的NettyServer
-    public static ProxyClientHandler createAndConnect(ChannelHandlerContext context, HostInfo hostInfo) throws InterruptedException {
-        return createAndConnect(context, hostInfo.getIp(), hostInfo.getPort());
+    public static ProxyClientHandler createAndConnect(MessageTransmitter transmitter, ChannelHandlerContext context, HostInfo hostInfo) throws InterruptedException {
+        return createAndConnect(transmitter, context, hostInfo.getIp(), hostInfo.getPort());
     }
 
-    public static ProxyClientHandler createAndConnect(ChannelHandlerContext context, String hostname, int port) throws InterruptedException {
-        return new ProxyNettyClient().createClient(context, hostname, port);
+    public static ProxyClientHandler createAndConnect(MessageTransmitter transmitter, ChannelHandlerContext context, String hostname, int port) throws InterruptedException {
+        return new ProxyNettyClient().createClient(transmitter, context, hostname, port);
     }
 
     private ProxyNettyClient(){
     }
 
-    public ProxyClientHandler createClient(ChannelHandlerContext context, String hostname, int port) throws InterruptedException {
-        return createClient0(context, hostname, port);
+    public ProxyClientHandler createClient(MessageTransmitter transmitter, ChannelHandlerContext context, String hostname, int port) throws InterruptedException {
+        return createClient0(transmitter, context, hostname, port);
     }
 
-    private ProxyClientHandler createClient0(ChannelHandlerContext context, String hostname, int port) throws InterruptedException {
+    private ProxyClientHandler createClient0(MessageTransmitter transmitter, ChannelHandlerContext context, String hostname, int port) throws InterruptedException {
 
-        ProxyClientHandler client = new ProxyClientHandler(context);
+        ProxyClientHandler client = new ProxyClientHandler(transmitter, hostname, port, context);
         NioEventLoopGroup group = new NioEventLoopGroup(1);
         Bootstrap bootstrap = new Bootstrap();
         ByteBuf delimiter = Unpooled.copiedBuffer(BrokerNettyEncoder.DELIMITER.getBytes());

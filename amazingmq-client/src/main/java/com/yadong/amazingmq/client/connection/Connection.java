@@ -107,6 +107,20 @@ public class Connection {
         return this;
     }
 
+    public void reconnectClient() throws InterruptedException, ExecutionException {
+        client = AmazingMqNettyClient.createAndConnect(host, port);
+        Frame connectionFrame = FrameFactory.createConnectionFrame(this);
+        Frame result = client.syncSend(null, connectionFrame);
+        if(result != null){
+            if(result.getType() == Frame.PayloadType.CREATE_CONNECTION_SUCCESS.getType()){
+                this.connectionId = ObjectMapperUtils.toObject(result.getPayload(), ConnectionCreatedPayload.class).getConnectionId();
+                logger.info("切换Connection成功");
+            }else{
+                logger.info("切换Connection失败");
+            }
+        }
+    }
+
     public short getConnectionId() {
         return connectionId;
     }
@@ -118,7 +132,6 @@ public class Connection {
 
     public Channel createChannel() throws ExecutionException, InterruptedException {
         AMQChannel channel = new AMQChannel(channelIdGenerator.getAndIncrement(), this, client);
-        System.out.println("-----------channelId = " + channel.getChannelNumber());
 
         Frame result = client.syncSend(channel, FrameFactory.createChannelFrame(channel));
         if(result != null){
