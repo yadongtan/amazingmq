@@ -21,6 +21,7 @@ public class DeadLetterConsumer {
         factory.setUsername("guest");
         factory.setPassword("guest");
         factory.setHost("127.0.0.1");
+        //factory.setPort(36666);
         factory.setVirtualHost("/");
         // 建立到AmazingMq的连接
         Connection connection = factory.newConnection();

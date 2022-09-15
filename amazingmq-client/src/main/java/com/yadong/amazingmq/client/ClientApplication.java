@@ -23,6 +23,7 @@ public class ClientApplication {
         factory.setPassword("guest");
         factory.setHost("127.0.0.1");
         factory.setVirtualHost("/");
+        factory.setPort(36666);
         // 建立到AmazingMq的连接
         Connection connection = factory.newConnection();
         // 创建信道

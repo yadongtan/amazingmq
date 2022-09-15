@@ -87,8 +87,5 @@ public class AmazingMqBrokerController {
         });
 
         return builder.toString() + connectionInfo.toString();
-
-
-
     }
 }

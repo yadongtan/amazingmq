@@ -11,6 +11,7 @@
         <module name="amazingmq-server" />
         <module name="amazingmq-commons" />
         <module name="amazingmq-test" />
+        <module name="amazingmq-proxy" />
       </profile>
     </annotationProcessing>
   </component>
