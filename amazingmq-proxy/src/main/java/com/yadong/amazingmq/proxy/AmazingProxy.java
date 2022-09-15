@@ -2,6 +2,7 @@ package com.yadong.amazingmq.proxy;
 
 
 import com.yadong.amazingmq.property.HostInfo;
+import com.yadong.amazingmq.proxy.netty.ProxyNettyServer;
 import com.yadong.amazingmq.proxy.properties.ProxyProperties;
 
 import java.util.ArrayList;

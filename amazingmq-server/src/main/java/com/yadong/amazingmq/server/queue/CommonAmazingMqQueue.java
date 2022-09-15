@@ -10,5 +10,4 @@ public class CommonAmazingMqQueue extends AbstractAmazingMqQueue {
         super(queueName, autoDelete, durable, exclusive, arguments, virtualHost);
     }
 
-
 }

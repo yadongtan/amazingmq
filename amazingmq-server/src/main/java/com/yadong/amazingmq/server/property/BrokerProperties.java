@@ -1,28 +1,35 @@
 package com.yadong.amazingmq.server.property;
 
 
+import com.yadong.amazingmq.property.HostInfo;
+
 public class BrokerProperties {
-    private String host;
-    private int port;
+    private HostInfo brokerHostInfo;
+    private HostInfo clusterHostInfo;   //集群通讯开放的ip和端口
 
-    public BrokerProperties(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public BrokerProperties(HostInfo brokerHostInfo) {
+        this.brokerHostInfo = brokerHostInfo;
     }
 
-    public String getHost() {
-        return host;
+
+    public BrokerProperties(HostInfo brokerHostInfo, HostInfo clusterHostInfo) {
+        this.brokerHostInfo = brokerHostInfo;
+        this.clusterHostInfo = clusterHostInfo;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public HostInfo getBrokerHostInfo() {
+        return brokerHostInfo;
     }
 
-    public int getPort() {
-        return port;
+    public void setBrokerHostInfo(HostInfo brokerHostInfo) {
+        this.brokerHostInfo = brokerHostInfo;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public HostInfo getClusterHostInfo() {
+        return clusterHostInfo;
+    }
+
+    public void setClusterHostInfo(HostInfo clusterHostInfo) {
+        this.clusterHostInfo = clusterHostInfo;
     }
 }

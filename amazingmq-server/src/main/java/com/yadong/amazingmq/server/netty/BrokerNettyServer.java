@@ -53,9 +53,9 @@ public class BrokerNettyServer {
 
     // the really method to start provider server
     private void start(BrokerProperties properties){
-        int port = properties.getPort();
+        int port = properties.getBrokerHostInfo().getPort();
         try {
-            String hostAddress = properties.getHost();
+            String hostAddress = properties.getBrokerHostInfo().getIp();
             if(hostAddress == null){
                 hostAddress = InetAddress.getLocalHost().getHostAddress();
             }

@@ -1,10 +1,9 @@
-package com.yadong.amazingmq.proxy;
-
+package com.yadong.amazingmq.server.cluster;
 
 import com.yadong.amazingmq.codec.BrokerNettyDecoder;
 import com.yadong.amazingmq.codec.BrokerNettyEncoder;
-import com.yadong.amazingmq.proxy.netty.handler.AmazingProxyHandler;
-import com.yadong.amazingmq.proxy.properties.ProxyProperties;
+import com.yadong.amazingmq.server.cluster.handler.ClusterServerHandler;
+import com.yadong.amazingmq.server.property.BrokerProperties;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -19,20 +18,24 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class ProxyNettyServer {
+/**
+* @author YadongTan
+* @date 2022/9/15 13:09
+* @Description mq集群间通信用的Server
+*/
+public class ClusterNettyServer {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClusterNettyServer.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(ProxyNettyServer.class);
+    private ClusterNettyServer(){}
 
-    private ProxyNettyServer(){}
+    private static ClusterNettyServer _INSTANCE;
 
-    private static ProxyNettyServer _INSTANCE;
-
-    public static ProxyNettyServer getInstance() {
+    public static ClusterNettyServer getInstance() {
         if(_INSTANCE == null){
-            synchronized (ProxyNettyServer.class){
+            synchronized (ClusterNettyServer.class){
                 if(_INSTANCE == null){
-                    _INSTANCE = new ProxyNettyServer();
+                    _INSTANCE = new ClusterNettyServer();
                 }
             }
         }
@@ -40,7 +43,7 @@ public class ProxyNettyServer {
     }
 
     // the really method to start provider server
-    public void syncStart(ProxyProperties properties){
+    public void syncStart(BrokerProperties properties){
         new Thread(()->{
             start(properties);
         }).start();
@@ -48,10 +51,10 @@ public class ProxyNettyServer {
 
 
     // the really method to start provider server
-    private void start(ProxyProperties properties){
-        int port = properties.getProxyStartHostInfo().getPort();
+    private void start(BrokerProperties properties){
+        int port = properties.getClusterHostInfo().getPort();
         try {
-            String hostAddress = properties.getProxyStartHostInfo().getIp();
+            String hostAddress = properties.getClusterHostInfo().getIp();
             if(hostAddress == null){
                 hostAddress = InetAddress.getLocalHost().getHostAddress();
             }
@@ -60,9 +63,10 @@ public class ProxyNettyServer {
             e.printStackTrace();
         }
     }
+
     private void start0(String hostname, int port){
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        NioEventLoopGroup workerGroup = new NioEventLoopGroup(64);
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup(4);
         ServerBootstrap bootstrap = new ServerBootstrap();
         ByteBuf delimiter = Unpooled.copiedBuffer(BrokerNettyEncoder.DELIMITER.getBytes());
         bootstrap.group(bossGroup, workerGroup)
@@ -78,17 +82,16 @@ public class ProxyNettyServer {
                                 .addFirst(new DelimiterBasedFrameDecoder(60000,delimiter))
                                 .addLast(new BrokerNettyDecoder())
                                 .addLast(new BrokerNettyEncoder())
-                                .addLast(new AmazingProxyHandler());
+                                .addLast(new ClusterServerHandler());
                     }
                 });
         try {
             ChannelFuture channelFuture = bootstrap.bind(hostname, port);
             Channel channel = channelFuture.channel();
-            logger.info("启动 Proxy [" + hostname + ":" + port + "] 成功");
+            logger.info("启动 集群间通信Server 成功, 连接:[ " +hostname +":" + port +"]");
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }

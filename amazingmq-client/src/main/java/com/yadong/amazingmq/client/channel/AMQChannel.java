@@ -82,7 +82,7 @@ public class AMQChannel implements Channel{
     public boolean basicPublish(String exchangeName, String routingKey, Map<String, Object> basicProperties, byte[] messageBodyBytes) throws ExecutionException, InterruptedException {
         Frame frame = client.syncSend(this, FrameFactory.createBasicPublishFrame(this, exchangeName, routingKey, basicProperties, messageBodyBytes));
         if(frame.getType() == Frame.PayloadType.SUCCESSFUL.getType()){
-            //logger.info(" 发布消息 [" + new String(messageBodyBytes) + "] 成功");
+            logger.info(" 发布消息 [" + new String(messageBodyBytes) + "] 成功");
             return true;
         }else{
             logger.info(" 发布消息 [" + new String(messageBodyBytes) + "] 失败");
